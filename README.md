@@ -14,4 +14,4 @@ newname - Changes ur name (Not completed)
 
 kill {user} - Kill someone from your server
 ```
-
+These are the commands for my Bot. More Commands coming soon...
