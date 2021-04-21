@@ -6,7 +6,7 @@ https://discord.com/oauth2/authorize?client_id=833680896569507840&scope=bot%20
 
 ### My Discord Bot
 
-##Commands:
+--> Commands:
 ```markdown
 help me - Showing this page
 
