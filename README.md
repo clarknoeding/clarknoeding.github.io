@@ -1,14 +1,18 @@
-## Welcome to GitHub Pages
+## Welcome on my Github Page!
 
-You can use the [editor on GitHub](https://github.com/clarknoeding/clarknoeding.github.io/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+My name is Clark and I'm 13 years old. I've got many projects! My newest project is a nice bot, which I'm coding rn. U can invite him here and u can test him:
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### My Discord Bot
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
+##Commands:
 ```markdown
+help me - Showing this page
+
+newname - Changes ur name (Not completed)
+
+kill {user} - Kill someone from your server
+```
+
 Syntax highlighted code block
 
 # Header 1
