@@ -14,5 +14,13 @@ help me - Showing this page
 newname - Changes ur name (Not completed)
 
 kill {user} - Kill someone from your server
+
+bal / Ma Balance - Shows your balance (Just for fun)
+
+google - Opens google
+
+Useful Site - Shows random useful sites
+
+toolbox - Coming soon...
 ```
 These are the commands for my Bot. More Commands coming soon...
