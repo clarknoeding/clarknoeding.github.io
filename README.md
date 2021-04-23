@@ -21,6 +21,14 @@ google - Opens google
 
 Useful Site - Shows random useful sites
 
-toolbox - Coming soon...
+```
+Toolbox Commands:
+
+```
+yt - Youtube
+ggle - Google
+ghub - Github
+gif - Giphy
+
 ```
 These are the commands for my Bot. More Commands coming soon...
