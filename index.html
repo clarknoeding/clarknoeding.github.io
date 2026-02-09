@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C/N — Digital Architecture & Strategy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Instrument+Serif:italic@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-blue: #0070f3;
+            --bg-black: #000000;
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --line-color: rgba(255, 255, 255, 0.06);
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: #ffffff;
+            font-family: 'Inter Tight', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .font-serif { font-family: 'Instrument Serif', serif; }
+
+        /* LOADING SCREEN */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.6s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-logo {
+            font-size: 32px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .loading-logo .slash {
+            color: var(--accent-blue);
+            animation: pulse-slash 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-slash {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* PAGE TRANSITIONS */
+        .page-container {
+            display: none;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .page-container.active {
+            display: block;
+        }
+
+        .page-container.fade-out {
+            animation: fadeOutDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOutDown {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        /* LOGO ANIMATION */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+        }
+        .logo-group { display: flex; align-items: center; }
+        .logo-expand {
+            display: inline-block;
+            max-width: 0;
+            opacity: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.16, 0.5, 0.3, 1);
+            font-size: 20px;
+            letter-spacing: 0.1em;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        
+        @media (min-width: 768px) {
+            .logo-container:hover .logo-expand { max-width: 120px; opacity: 1; }
+        }
+        
+        .logo-slash { color: var(--accent-blue); margin: 0 4px; }
+
+        /* MOBILE MENU */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px;
+            position: relative;
+            z-index: 110;
+            width: 40px;
+            height: 40px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger.active {
+            gap: 0;
+        }
+
+        .hamburger.active span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -12px;
+            margin-top: -1px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg);
+        }
+
+        /* VERCEL STYLE BUTTONS */
+        .cta-vercel-primary {
+            background-color: #fff;
+            color: #000;
+            padding: 12px 28px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+        }
+        .cta-vercel-primary:hover {
+            background-color: #eaeaea;
+            transform: translateY(-1px);
+        }
+
+        .cta-vercel-secondary {
+            background-color: rgba(255, 255, 255, 0.02);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border-subtle);
+            transition: all 0.2s ease;
+        }
+
+        /* HERO AMBIENT */
+        .hero-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70vw;
+            height: 50vh;
+            background: radial-gradient(circle, rgba(0, 112, 243, 0.04) 0%, transparent 70%);
+            filter: blur(100px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .grid-lines {
+            background-image: linear-gradient(to right, rgba(255,255,255,0.012) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.012) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* MOUSE HOVER GLOW EFFECT */
+        .glow-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.002);
+            overflow: hidden;
+        }
+        .hover-glow-effect {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(300px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.07), transparent 80%);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @media (min-width: 768px) {
+            .glow-card:hover .hover-glow-effect {
+                opacity: 1;
+            }
+        }
+
+        /* VERCEL GRID SYSTEM */
+        .vercel-outer-grid {
+            border-left: 0.5px solid var(--line-color);
+            border-right: 0.5px solid var(--line-color);
+        }
+        
+        @media (max-width: 767px) {
+            .vercel-outer-grid {
+                border-left: none;
+                border-right: none;
+            }
+        }
+        
+        .vercel-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            border-top: 0.5px solid var(--line-color);
+        }
+        
+        @media (min-width: 768px) {
+            .vercel-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .vercel-grid-item {
+            border-right: 0.5px solid var(--line-color);
+            border-bottom: 0.5px solid var(--line-color);
+            padding: 3rem 2rem;
+            position: relative;
+        }
+        
+        @media (min-width: 768px) {
+            .vercel-grid-item {
+                padding: 5rem 3.5rem;
+            }
+            .vercel-grid-item:nth-child(even) {
+                border-right: none;
+            }
+        }
+        
+        /* ILLUSTRATION HOVER LIGHTING */
+        .illustration-container {
+            position: absolute;
+            right: 1.5rem;
+            bottom: 1.5rem;
+            width: 60px;
+            height: 60px;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+        
+        @media (min-width: 768px) {
+            .illustration-container {
+                right: 2.5rem;
+                bottom: 2.5rem;
+                width: 100px;
+                height: 100px;
+            }
+        }
+        
+        .fine-line-svg-base {
+            position: absolute;
+            inset: 0;
+            stroke: rgba(255, 255, 255, 0.12);
+            stroke-width: 0.5px;
+            fill: none;
+        }
+
+        .fine-line-svg-highlight {
+            position: absolute;
+            inset: 0;
+            stroke: rgba(255, 255, 255, 0.45);
+            stroke-width: 0.75px;
+            fill: none;
+            mask-image: radial-gradient(50px circle at var(--mouse-x-local) var(--mouse-y-local), black, transparent 75%);
+            -webkit-mask-image: radial-gradient(50px circle at var(--mouse-x-local) var(--mouse-y-local), black, transparent 75%);
+            mask-repeat: no-repeat;
+            -webkit-mask-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        @media (min-width: 768px) {
+            .vercel-grid-item:hover .fine-line-svg-highlight {
+                opacity: 1;
+            }
+            .vercel-grid-item:hover .illustration-container {
+                transform: translateY(-3px);
+            }
+        }
+
+        .bento-card {
+            border: 0.5px solid rgba(255, 255, 255, 0.08);
+            transition: border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        @media (min-width: 768px) {
+            .bento-card:hover {
+                border-color: rgba(255, 255, 255, 0.18);
+            }
+        }
+
+        /* HOVER ARROW INDICATOR */
+        .hover-arrow {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            opacity: 0;
+            transform: translate(-10px, 10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            color: rgba(255, 255, 255, 0.4);
+            z-index: 20;
+        }
+        
+        @media (max-width: 767px) {
+            .hover-arrow {
+                opacity: 0.3;
+                transform: translate(0, 0);
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .bento-card:hover .hover-arrow {
+                opacity: 1;
+                transform: translate(0, 0);
+            }
+        }
+
+        .reveal-up { opacity: 0; transform: translateY(12px); }
+
+        .bento-feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-rows: minmax(200px, auto);
+            gap: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .bento-feature-grid {
+                grid-template-columns: repeat(6, 1fr);
+                grid-template-rows: repeat(2, 300px);
+                gap: 1.5rem;
+            }
+        }
+
+        .mono-anim-bar {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            background-size: 200% 100%;
+            animation: mono-slide 3s infinite linear;
+        }
+        @keyframes mono-slide {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .mono-circle-pulse {
+            animation: mono-pulse 2s infinite ease-in-out;
+        }
+        @keyframes mono-pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        /* RESPONSIVE ADJUSTMENTS */
+        @media (max-width: 767px) {
+            .hero-glow {
+                width: 90vw;
+                height: 40vh;
+            }
+            
+            .grid-lines {
+                background-size: 40px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen">
+        <div class="loading-logo">
+            <span>C</span>
+            <span class="slash">/</span>
+            <span>N</span>
+        </div>
+    </div>
+
+    <div class="fixed inset-0 grid-lines pointer-events-none"></div>
+    <div id="dynamic-glow" class="hero-glow"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 px-4 md:px-8 py-4 md:py-6 flex justify-between items-center bg-black/30 backdrop-blur-xl border-b border-white/5">
+        <div class="logo-container" onclick="showPage('home')">
+            <div class="logo-group">
+                <span>C</span><span class="logo-expand">LARK</span>
+            </div>
+            <span class="logo-slash">/</span>
+            <div class="logo-group">
+                <span>N</span><span class="logo-expand">OEDING</span>
+            </div>
+        </div>
+        
+        <div class="hidden md:flex gap-10 text-[10px] uppercase tracking-[0.3em] font-medium text-gray-500">
+            <a href="#studio" onclick="scrollToSection('studio')" class="hover:text-white transition-colors">Agency</a>
+            <a href="#ventures" onclick="scrollToSection('ventures')" class="hover:text-white transition-colors">Ventures</a>
+        </div>
+
+        <div class="hidden md:block">
+            <a href="mailto:clarknoeding@proton.me" class="cta-vercel-secondary">
+                Get In Touch
+            </a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="flex justify-between items-center mb-8">
+            <div class="logo-container text-xl">
+                <div class="logo-group">
+                    <span>C</span>
+                </div>
+                <span class="logo-slash">/</span>
+                <div class="logo-group">
+                    <span>N</span>
+                </div>
+            </div>
+            <button class="hamburger active" id="mobile-close">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <div class="flex flex-col gap-8">
+            <a href="#studio" onclick="scrollToSection('studio'); closeMobileMenu();" class="text-2xl font-medium text-gray-400 hover:text-white transition-colors">Agency</a>
+            <a href="#ventures" onclick="scrollToSection('ventures'); closeMobileMenu();" class="text-2xl font-medium text-gray-400 hover:text-white transition-colors">Ventures</a>
+            <a href="mailto:clarknoeding@proton.me" onclick="closeMobileMenu();" class="text-2xl font-medium text-gray-400 hover:text-white transition-colors">Contact</a>
+        </div>
+        <div class="mt-auto">
+            <a href="mailto:clarknoeding@proton.me" onclick="closeMobileMenu();" class="cta-vercel-primary w-full text-center block">
+                Get In Touch
+            </a>
+        </div>
+    </div>
+
+    <!-- LANDING PAGE (Main) -->
+    <main id="home-page" class="page-container active">
+        <!-- Hero Section -->
+        <section class="relative min-h-screen pt-32 md:pt-32 flex flex-col justify-center items-center text-center px-4 md:px-6">
+            <div class="max-w-4xl z-10">
+                <div class="reveal-up inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/10 bg-blue-500/5 text-blue-400 text-[10px] uppercase tracking-widest mb-6 md:mb-10">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+                    </span>
+                    Available Q1 2026
+                </div>
+                <h1 class="text-4xl md:text-6xl lg:text-8xl font-medium tracking-tight leading-[1.05] mb-6 md:mb-8 reveal-up">
+                    Building <span class="font-serif italic text-blue-500">high-end</span> <br> digital architecture.
+                </h1>
+                <p class="text-gray-500 text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-8 md:mb-12 font-light reveal-up px-4">
+                    A specialized house for MROI-driven strategy, brand discovery, and technical excellence. We scale ventures from zero to one.
+                </p>
+                <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-6 reveal-up px-4">
+                    <a href="mailto:clarknoeding@proton.me" class="cta-vercel-primary text-center">Start Project</a>
+                    <a href="#ventures" onclick="scrollToSection('ventures')" class="inline-flex items-center justify-center text-sm text-gray-400 hover:text-white transition-colors">
+                        Explore Ecosystem <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENCY SECTION -->
+        <section id="studio" class="py-20 md:py-32 px-4 md:px-6 lg:px-24 bg-black relative">
+            <div class="max-w-7xl mx-auto vercel-outer-grid">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-stretch">
+                    <div class="flex-1 p-8 md:p-12 lg:p-16 border-b md:border-b-0 md:border-r border-white/5">
+                        <div class="text-[10px] uppercase tracking-[0.4em] text-blue-500 font-bold mb-6 md:mb-8">Studio Focus</div>
+                        <h2 class="text-3xl md:text-5xl lg:text-6xl font-medium tracking-tighter leading-none mb-6 md:mb-8">
+                            The Studio. <br>
+                            <span class="font-serif italic text-gray-400">Impact Driven.</span>
+                        </h2>
+                        <p class="text-gray-500 text-base md:text-lg font-light leading-relaxed max-w-md">
+                            Combining deep brand understanding with strategic MROI frameworks to architect high-performance digital ventures.
+                        </p>
+                    </div>
+                    <div class="w-full md:w-1/3 p-8 md:p-12 lg:p-16 flex flex-col justify-end gap-6 bg-white/[0.003]">
+                        <div class="space-y-1">
+                            <span class="text-[10px] uppercase tracking-widest text-gray-600 font-bold block">Waitlist</span>
+                            <span class="text-sm text-gray-400 font-light">Launching March 2026</span>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <a href="mailto:clarknoeding@proton.me" class="cta-vercel-primary w-full text-sm text-center">Get In Touch</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vercel-grid">
+                    <div class="vercel-grid-item glow-card">
+                        <div class="hover-glow-effect"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-white text-lg md:text-xl font-medium mb-3 tracking-tight">Brand Discovery</h3>
+                            <p class="text-gray-500 text-sm font-light max-w-[240px] leading-relaxed">
+                                A brand-first approach ensuring your identity is the catalyst for all digital growth.
+                            </p>
+                        </div>
+                        <div class="illustration-container">
+                            <svg viewBox="0 0 60 60" class="fine-line-svg-base"><circle cx="30" cy="30" r="22" /><circle cx="30" cy="30" r="7" /><line x1="5" y1="30" x2="55" y2="30" /><line x1="30" y1="5" x2="30" y2="55" /></svg>
+                            <svg viewBox="0 0 60 60" class="fine-line-svg-highlight"><circle cx="30" cy="30" r="22" /><circle cx="30" cy="30" r="7" /><line x1="5" y1="30" x2="55" y2="30" /><line x1="30" y1="5" x2="30" y2="55" /></svg>
+                        </div>
+                    </div>
+                    <div class="vercel-grid-item glow-card">
+                        <div class="hover-glow-effect"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-white text-lg md:text-xl font-medium mb-3 tracking-tight">MROI Strategy</h3>
+                            <p class="text-gray-500 text-sm font-light max-w-[240px] leading-relaxed">
+                                Data-backed strategy built to maximize return on investment and scalable impact.
+                            </p>
+                        </div>
+                        <div class="illustration-container">
+                            <svg viewBox="0 0 60 60" class="fine-line-svg-base"><rect x="18" y="18" width="24" height="24" /><line x1="10" y1="50" x2="50" y2="10" /><circle cx="30" cy="30" r="3" /></svg>
+                            <svg viewBox="0 0 60 60" class="fine-line-svg-highlight"><rect x="18" y="18" width="24" height="24" /><line x1="10" y1="50" x2="50" y2="10" /><circle cx="30" cy="30" r="3" /></svg>
+                        </div>
+                    </div>
+                    <div class="vercel-grid-item glow-card">
+                        <div class="hover-glow-effect"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-white text-lg md:text-xl font-medium mb-3 tracking-tight">Digital First</h3>
+                            <p class="text-gray-500 text-sm font-light max-w-[240px] leading-relaxed">
+                                Modern architecture that scales effortlessly, bridging design and technical excellence.
+                            </p>
+                        </div>
+                        <div class="illustration-container">
+                            <svg viewBox="0 0 60 60" class="fine-line-svg-base"><path d="M12 12h36v36H12z" /><path d="M12 12l36 36M48 12L12 48" /></svg>
+                            <svg viewBox="0 0 60 60" class="fine-line-svg-highlight"><path d="M12 12h36v36H12z" /><path d="M12 12l36 36M48 12L12 48" /></svg>
+                        </div>
+                    </div>
+                    <div class="vercel-grid-item glow-card">
+                        <div class="hover-glow-effect"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-white text-lg md:text-xl font-medium mb-3 tracking-tight">Impact & Growth</h3>
+                            <p class="text-gray-500 text-sm font-light max-w-[240px] leading-relaxed">
+                                Focused on sustainable growth and long-term value for every venture we architect.
+                            </p>
+                        </div>
+                        <div class="illustration-container">
+                            <svg viewBox="0 0 60 60" class="fine-line-svg-base"><circle cx="30" cy="30" r="26" stroke-dasharray="2 5"/><path d="M30 20v20M20 30h20" /></svg>
+                            <svg viewBox="0 0 60 60" class="fine-line-svg-highlight"><circle cx="30" cy="30" r="26" stroke-dasharray="2 5"/><path d="M30 20v20M20 30h20" /></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VENTURES SECTION -->
+        <section id="ventures" class="py-20 md:py-40 px-4 md:px-8 lg:px-24">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-6 md:gap-8">
+                    <div>
+                        <h2 class="text-[10px] uppercase tracking-[0.4em] text-gray-500 mb-4">Ecosystem</h2>
+                        <h3 class="text-2xl md:text-4xl lg:text-5xl font-medium tracking-tight">Proprietary Ventures.</h3>
+                    </div>
+                    <p class="text-gray-500 max-w-sm text-sm font-light">Internal labs for tomorrow's tools, focusing on AI-operations and learning.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-6">
+                    <div onclick="showPage('venture-os')" class="md:col-span-4 bento-card glow-card p-8 md:p-12 rounded-3xl min-h-[350px] md:min-h-[450px] flex flex-col justify-between group">
+                        <div class="hover-glow-effect"></div>
+                        <div class="hover-arrow">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7V17" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="h-9 w-9 bg-blue-600/5 border border-blue-500/10 rounded-lg flex items-center justify-center mb-6 md:mb-10">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </div>
+                            <h4 class="text-2xl md:text-3xl font-medium mb-4 tracking-tight">Venture OS</h4>
+                            <p class="text-gray-500 max-w-md font-light leading-relaxed text-sm md:text-base">AI-powered roadmap and operations blueprint. We automate legal, finance, and strategy.</p>
+                        </div>
+                        <div class="relative z-10 flex items-center gap-4 md:gap-6 pt-6 md:pt-10 border-t border-white/5 text-[9px] uppercase tracking-widest text-gray-600 font-medium">
+                            <span class="text-blue-500">Goal Engine</span>
+                            <span>Ops Visualizer</span>
+                        </div>
+                    </div>
+
+                    <div onclick="showPage('hub')" class="md:col-span-2 bento-card glow-card p-8 md:p-12 rounded-3xl min-h-[300px] flex flex-col justify-between group">
+                        <div class="hover-glow-effect"></div>
+                        <div class="hover-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7V17" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="relative z-10">
+                            <h4 class="text-xl md:text-2xl font-medium mb-4 tracking-tight">Hub</h4>
+                            <p class="text-sm text-gray-500 font-light leading-relaxed">Business KPI visualizer for modern founders to measure growth in real-time.</p>
+                        </div>
+                        <div class="relative z-10 h-20 md:h-24 w-full flex items-end gap-2 px-2">
+                            <div class="flex-1 bg-blue-500/5 h-1/3 rounded-t-sm"></div>
+                            <div class="flex-1 bg-blue-500/10 h-1/2 rounded-t-sm"></div>
+                            <div class="flex-1 bg-blue-500/80 h-full rounded-t-sm"></div>
+                        </div>
+                    </div>
+
+                    <div onclick="showPage('aura-learn')" class="md:col-span-6 bento-card glow-card p-8 md:p-12 rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group">
+                        <div class="hover-glow-effect"></div>
+                        <div class="hover-arrow">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7V17" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="md:w-1/2 relative z-10">
+                            <h4 class="text-xl md:text-2xl font-medium mb-4 tracking-tight">Aura Learn</h4>
+                            <p class="text-gray-500 text-sm font-light leading-relaxed">AI learning engine for personalized curricula with visual and practical lessons.</p>
+                        </div>
+                        <div class="w-full md:w-1/3 relative z-10">
+                            <div class="p-4 border border-white/5 bg-white/[0.015] rounded-2xl flex justify-between items-center">
+                                <span class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Smart Curriculum</span>
+                                <div class="w-1.5 h-1.5 rounded-full bg-blue-500/60"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- VENTURE SUBPAGE: VENTURE OS -->
+    <main id="venture-os-page" class="page-container py-20 md:py-32 px-4 md:px-8 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16 md:mb-24">
+                <div class="inline-block px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[10px] uppercase tracking-widest mb-6 md:mb-10 text-gray-400">Product Showcase</div>
+                <h1 class="text-4xl md:text-6xl lg:text-8xl font-medium tracking-tighter leading-none mb-6 md:mb-10">Venture OS. <br><span class="font-serif italic text-gray-500">The Blueprint for Alpha.</span></h1>
+                <p class="text-gray-500 text-base md:text-xl max-w-2xl font-light leading-relaxed mb-8 md:mb-12">A comprehensive operating system that eliminates operational overhead when launching and scaling digital ventures. From legal structure to growth roadmaps, everything is automated.</p>
+                <div class="flex flex-col md:flex-row gap-4 md:gap-6">
+                    <a href="mailto:clarknoeding@proton.me" class="cta-vercel-primary text-center">Get In Touch</a>
+                    <button onclick="showPage('home')" class="text-sm text-gray-500 hover:text-white transition-colors">← Back to Ecosystem</button>
+                </div>
+            </div>
+            <div class="bento-feature-grid mb-20 md:mb-40">
+                <div class="col-span-2 md:col-span-4 glow-card bento-card rounded-3xl p-8 md:p-12 flex flex-col justify-between">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10">
+                        <h4 class="text-xl md:text-2xl font-medium mb-2">Automated Roadmap</h4>
+                        <p class="text-gray-500 text-sm font-light">Dynamic timelines that adapt to your progress.</p>
+                    </div>
+                    <div class="h-24 md:h-32 w-full flex flex-col gap-3 justify-end mt-6">
+                        <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full w-2/3 mono-anim-bar"></div></div>
+                        <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full w-1/2 mono-anim-bar"></div></div>
+                    </div>
+                </div>
+                <div class="col-span-1 md:col-span-2 glow-card bento-card rounded-3xl p-6 md:p-10 flex flex-col justify-between">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10"><h4 class="text-lg md:text-xl font-medium mb-2">Legal Stack</h4><p class="text-gray-400 text-xs font-light">Ready-to-use contracts and documentation.</p></div>
+                    <div class="flex justify-center mt-4"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-gray-600"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                </div>
+                <div class="col-span-1 md:col-span-2 glow-card bento-card rounded-3xl p-6 md:p-10 flex flex-col justify-between">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10"><h4 class="text-lg md:text-xl font-medium mb-2">Ops Flow</h4><p class="text-gray-400 text-xs font-light">Streamlined workflows for every team.</p></div>
+                    <div class="grid grid-cols-3 gap-1 mt-4"><div class="h-6 bg-white/10 rounded-sm"></div><div class="h-6 bg-white/5 rounded-sm"></div><div class="h-6 bg-white/20 rounded-sm"></div></div>
+                </div>
+                <div class="col-span-2 md:col-span-4 glow-card bento-card rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10 max-w-xs"><h4 class="text-xl md:text-2xl font-medium mb-2">Financial Engine</h4><p class="text-gray-500 text-sm font-light">Automated forecasts for precise cashflow management.</p></div>
+                    <div class="w-16 h-16 rounded-full border border-white/5 flex items-center justify-center"><div class="w-8 h-8 rounded-full bg-white/10 animate-pulse"></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- VENTURE SUBPAGE: HUB -->
+    <main id="hub-page" class="page-container py-20 md:py-32 px-4 md:px-8 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16 md:mb-24">
+                <div class="inline-block px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[10px] uppercase tracking-widest mb-6 md:mb-10 text-gray-400">Metrics Visualizer</div>
+                <h1 class="text-4xl md:text-6xl lg:text-8xl font-medium tracking-tighter leading-none mb-6 md:mb-10">Hub. <br><span class="font-serif italic text-gray-500">The Core of Data.</span></h1>
+                <p class="text-gray-500 text-base md:text-xl max-w-2xl font-light leading-relaxed mb-8 md:mb-12">Hub provides founders with a crystal-clear view of their business KPIs. No more complex spreadsheets – just the data that truly matters, beautifully visualized.</p>
+                <div class="flex flex-col md:flex-row gap-4 md:gap-6">
+                    <a href="mailto:clarknoeding@proton.me" class="cta-vercel-primary text-center">Get In Touch</a>
+                    <button onclick="showPage('home')" class="text-sm text-gray-500 hover:text-white transition-colors">← Back to Ecosystem</button>
+                </div>
+            </div>
+            <div class="bento-feature-grid mb-20 md:mb-40">
+                <div class="col-span-2 md:col-span-3 glow-card bento-card rounded-3xl p-8 md:p-12 flex flex-col justify-between">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10"><h4 class="text-lg md:text-xl font-medium mb-2">Live Tracking</h4><p class="text-gray-400 text-xs font-light">Real-time data sync across all platforms.</p></div>
+                    <div class="flex gap-2 items-end h-16 md:h-20 mt-6"><div class="w-2 bg-white/20 h-10 rounded-t"></div><div class="w-2 bg-white/40 h-16 rounded-t"></div><div class="w-2 bg-white/10 h-8 rounded-t"></div><div class="w-2 bg-white/60 h-20 rounded-t"></div></div>
+                </div>
+                <div class="col-span-2 md:col-span-3 glow-card bento-card rounded-3xl p-8 md:p-12 flex flex-col justify-between">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10"><h4 class="text-lg md:text-xl font-medium mb-2">Custom Alerts</h4><p class="text-gray-400 text-xs font-light">Notifications for anomalies or successes.</p></div>
+                    <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center mono-circle-pulse mt-6"><div class="w-4 h-4 rounded-full bg-white/40"></div></div>
+                </div>
+                <div class="col-span-2 md:col-span-6 glow-card bento-card rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10 max-w-md"><h4 class="text-xl md:text-2xl font-medium mb-2">Deep Insights AI</h4><p class="text-gray-500 text-sm font-light">Hub automatically analyzes trends and provides action recommendations based on historical data.</p></div>
+                    <div class="h-20 w-full md:w-40 border border-white/5 rounded-lg overflow-hidden relative"><div class="absolute inset-0 mono-anim-bar"></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- VENTURE SUBPAGE: AURA LEARN -->
+    <main id="aura-learn-page" class="page-container py-20 md:py-32 px-4 md:px-8 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16 md:mb-24">
+                <div class="inline-block px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[10px] uppercase tracking-widest mb-6 md:mb-10 text-gray-400">AI Education</div>
+                <h1 class="text-4xl md:text-6xl lg:text-8xl font-medium tracking-tighter leading-none mb-6 md:mb-10">Aura Learn. <br><span class="font-serif italic text-gray-500">Mastery Reimagined.</span></h1>
+                <p class="text-gray-500 text-base md:text-xl max-w-2xl font-light leading-relaxed mb-8 md:mb-12">The future of learning is adaptive. Aura Learn creates personalized learning paths that adapt in real-time to your understanding and pace.</p>
+                <div class="flex flex-col md:flex-row gap-4 md:gap-6">
+                    <a href="mailto:clarknoeding@proton.me" class="cta-vercel-primary text-center">Visit Web App</a>
+                    <button onclick="showPage('home')" class="text-sm text-gray-500 hover:text-white transition-colors">← Back to Ecosystem</button>
+                </div>
+            </div>
+            <div class="bento-feature-grid mb-20 md:mb-40">
+                <div class="col-span-1 md:col-span-2 glow-card bento-card rounded-3xl p-6 md:p-10 flex flex-col justify-between">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10"><h4 class="text-lg md:text-xl font-medium mb-2">Smart Path</h4><p class="text-gray-400 text-xs font-light">Adaptive curricula.</p></div>
+                    <svg viewBox="0 0 100 20" class="w-full text-gray-700 stroke-current fill-none mt-4"><path d="M0 10 Q 25 0, 50 10 T 100 10" stroke-width="2" class="opacity-20"/><circle cx="50" cy="10" r="3" class="text-blue-500 fill-current"/></svg>
+                </div>
+                <div class="col-span-2 md:col-span-4 glow-card bento-card rounded-3xl p-8 md:p-12 flex flex-col justify-between">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10"><h4 class="text-xl md:text-2xl font-medium mb-2">Visual Knowledge Graph</h4><p class="text-gray-500 text-sm font-light">Understand connections through interactive, networked concepts instead of linear text.</p></div>
+                    <div class="flex gap-4 mt-6"><div class="w-8 h-8 rounded-full border border-white/10"></div><div class="w-8 h-8 rounded-full border border-white/10 bg-white/5"></div><div class="w-8 h-8 rounded-full border border-white/10"></div></div>
+                </div>
+                <div class="col-span-1 md:col-span-3 glow-card bento-card rounded-3xl p-6 md:p-10 flex flex-col justify-between">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10"><h4 class="text-lg md:text-xl font-medium mb-2">Flash Cards</h4><p class="text-gray-400 text-xs font-light">AI-generated quizzes.</p></div>
+                    <div class="w-20 h-12 bg-white/5 border border-white/10 rounded mx-auto rotate-3 mt-4"></div>
+                </div>
+                <div class="col-span-1 md:col-span-3 glow-card bento-card rounded-3xl p-6 md:p-10 flex flex-col justify-between">
+                    <div class="hover-glow-effect"></div>
+                    <div class="relative z-10"><h4 class="text-lg md:text-xl font-medium mb-2">Peer Feedback</h4><p class="text-gray-400 text-xs font-light">Real mentoring.</p></div>
+                    <div class="flex -space-x-2 mt-4"><div class="w-8 h-8 rounded-full bg-white/10 border border-black"></div><div class="w-8 h-8 rounded-full bg-white/5 border border-black"></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (Shared) -->
+    <footer id="contact" class="py-20 md:py-40 px-4 md:px-8 lg:px-24 border-t border-white/5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12 md:gap-20">
+            <div class="max-w-xl">
+                <h2 class="text-3xl md:text-5xl lg:text-7xl font-medium tracking-tighter mb-8 md:mb-12">Let's scale <br> <span class="font-serif italic text-gray-500">together.</span></h2>
+                <a href="mailto:clarknoeding@proton.me" class="text-xl md:text-3xl lg:text-4xl font-light text-white border-b border-white/5 pb-4 hover:border-blue-500/30 transition-all duration-500 break-all inline-block">clarknoeding@proton.me</a>
+            </div>
+            <div class="flex flex-col gap-8 md:gap-10 md:text-right">
+                <div class="flex flex-col gap-2">
+                    <span class="text-[10px] uppercase tracking-widest text-gray-700 font-bold">Social</span>
+                    <a href="#" class="text-sm text-gray-500 hover:text-blue-500 transition-colors">LinkedIn</a>
+                    <a href="#" class="text-sm text-gray-500 hover:text-blue-500 transition-colors">X / Twitter</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let isTransitioning = false;
+
+        // Mobile menu toggle
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileClose = document.getElementById('mobile-close');
+        
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+        });
+
+        mobileClose.addEventListener('click', () => {
+            closeMobileMenu();
+        });
+
+        function closeMobileMenu() {
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function showPage(pageId) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            const currentPage = document.querySelector('.page-container.active');
+            const targetPage = document.getElementById(pageId + '-page');
+            
+            if (!targetPage) {
+                isTransitioning = false;
+                return;
+            }
+            
+            if (currentPage === targetPage) {
+                isTransitioning = false;
+                return;
+            }
+
+            closeMobileMenu();
+            
+            // Fade out current page
+            currentPage.classList.add('fade-out');
+            
+            setTimeout(() => {
+                currentPage.classList.remove('active', 'fade-out');
+                targetPage.classList.add('active');
+                window.scrollTo({top: 0, behavior: 'instant'});
+                
+                setTimeout(() => {
+                    isTransitioning = false;
+                    if (typeof ScrollTrigger !== 'undefined') {
+                        ScrollTrigger.refresh();
+                    }
+                }, 100);
+            }, 500);
+        }
+
+        function scrollToSection(sectionId) {
+            const currentPage = document.querySelector('.page-container.active');
+            const homePage = document.getElementById('home-page');
+            
+            if (currentPage !== homePage) {
+                showPage('home');
+                setTimeout(() => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 800);
+            } else {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('hidden');
+            }, 1500);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            const handleMouseMove = e => {
+                const cards = document.querySelectorAll('.glow-card');
+                cards.forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+
+                    const illustration = card.querySelector('.illustration-container');
+                    if(illustration) {
+                        const illRect = illustration.getBoundingClientRect();
+                        const illX = e.clientX - illRect.left;
+                        const illY = e.clientY - illRect.top;
+                        card.style.setProperty('--mouse-x-local', `${illX}px`);
+                        card.style.setProperty('--mouse-y-local', `${illY}px`);
+                    }
+                });
+            };
+            window.addEventListener('mousemove', handleMouseMove);
+
+            gsap.to('.reveal-up', { opacity: 1, y: 0, duration: 1.2, stagger: 0.1, ease: 'expo.out' });
+
+            window.addEventListener('mousemove', (e) => {
+                const x = (e.clientX / window.innerWidth - 0.5) * 15;
+                const y = (e.clientY / window.innerHeight - 0.5) * 15;
+                gsap.to('#dynamic-glow', { x: x, y: y, duration: 2, ease: 'power2.out' });
+            });
+
+            gsap.utils.toArray('.bento-card, .vercel-grid-item').forEach(card => {
+                gsap.from(card, {
+                    scrollTrigger: { trigger: card, start: 'top 95%' },
+                    opacity: 0,
+                    y: 12,
+                    duration: 1.2,
+                    ease: 'power3.out'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
