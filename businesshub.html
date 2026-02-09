@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Hub Pro | Vercel Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js" type="module"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --v-bg: #ffffff;
+            --v-fg: #000000;
+            --v-accents-1: #fafafa;
+            --v-accents-2: #eaeaea;
+            --v-accents-3: #999999;
+            --v-accents-4: #888888;
+            --v-blue: #0070f3;
+            --v-success: #0070f3;
+            --v-error: #ee0000;
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 70px;
+        }
+
+        body {
+            background-color: var(--v-bg);
+            color: var(--v-fg);
+            font-family: 'Geist', 'Inter', -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+        #sidebar.collapsed .sidebar-text, 
+        #sidebar.collapsed .sidebar-header-text,
+        #sidebar.collapsed .sidebar-footer-card {
+            display: none;
+        }
+        #sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .vercel-card {
+            background: #fff;
+            border: 1px solid var(--v-accents-2);
+            border-radius: 8px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .vercel-card:hover {
+            border-color: var(--v-fg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .btn-v-primary {
+            background: var(--v-fg);
+            color: var(--v-bg);
+            border: 1px solid var(--v-fg);
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-v-primary:disabled {
+            background: var(--v-accents-3);
+            border-color: var(--v-accents-3);
+            cursor: not-allowed;
+        }
+
+        .btn-v-secondary {
+            background: var(--v-bg);
+            color: var(--v-accents-4);
+            border: 1px solid var(--v-accents-2);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-v-secondary:hover {
+            border-color: var(--v-fg);
+            color: var(--v-fg);
+        }
+
+        .input-v {
+            border: 1px solid var(--v-accents-2);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-v:focus { border-color: var(--v-fg); }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            color: var(--v-accents-4);
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: var(--v-fg);
+            background: var(--v-accents-1);
+        }
+
+        .badge-pro {
+            background: linear-gradient(135deg, #0070f3, #f81ce5);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .blur-lock {
+            position: absolute;
+            inset: 0;
+            backdrop-filter: blur(12px);
+            background: rgba(255,255,255,0.6);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .pulse-success {
+            animation: pulse-bg 1.5s ease;
+        }
+        @keyframes pulse-bg {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(0, 112, 243, 0.1); }
+            100% { background-color: transparent; }
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.4s ease forwards; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <!-- ONBOARDING -->
+    <div id="onboarding" class="fixed inset-0 z-[200] bg-white flex items-center justify-center p-6">
+        <div class="max-w-md w-full text-center">
+            <svg width="40" height="40" viewBox="0 0 76 65" fill="black" class="mx-auto mb-8"><path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/></svg>
+            <h1 class="text-3xl font-bold tracking-tighter mb-2">Business Hub Pro</h1>
+            <p class="text-slate-500 mb-10">Wähle dein Geschäftsmodell für optimierte Dashboards.</p>
+            <div class="space-y-3">
+                <button onclick="setup('SaaS')" class="w-full btn-v-secondary !justify-start flex items-center gap-3 p-4">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-sm font-bold">SaaS & Software</p>
+                        <p class="text-[10px] text-gray-400">MRR, Churn, LTV, CAC</p>
+                    </div>
+                </button>
+                <button onclick="setup('Ecommerce')" class="w-full btn-v-secondary !justify-start flex items-center gap-3 p-4">
+                    <div class="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-sm font-bold">E-Commerce</p>
+                        <p class="text-[10px] text-gray-400">ROAS, AOV, Contribution Margin</p>
+                    </div>
+                </button>
+                <button onclick="setup('Agency')" class="w-full btn-v-secondary !justify-start flex items-center gap-3 p-4">
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-sm font-bold">Agentur / Service</p>
+                        <p class="text-[10px] text-gray-400">Utilization, Hourly Rate, EBITDA</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP NAV -->
+    <header class="h-14 border-b border-vercel px-4 flex justify-between items-center bg-white z-50 shrink-0">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded-md transition">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <svg width="22" height="22" viewBox="0 0 76 65" fill="black"><path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/></svg>
+            <div class="h-4 w-[1px] bg-gray-200"></div>
+            <span class="text-sm font-medium tracking-tight" id="hub-name-display">Startup Hub</span>
+            <span id="global-pro-badge" class="hidden badge-pro">Pro</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="openModal('pro-modal')" class="text-xs font-semibold text-blue-600 hover:text-blue-700">Pro Features</button>
+            <div class="w-8 h-8 rounded-full border border-gray-200 overflow-hidden cursor-pointer" onclick="switchTab('settings')">
+                <img src="https://avatar.vercel.sh/startup" alt="Avatar">
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="border-r border-gray-100 bg-white flex flex-col p-3 shrink-0">
+            <div class="flex-1 space-y-6">
+                <div>
+                    <p class="sidebar-header-text text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3 mb-2">Workspace</p>
+                    <nav class="space-y-1">
+                        <div onclick="switchTab('insights')" class="nav-item active" id="nav-insights">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            <span class="sidebar-text">Insights</span>
+                        </div>
+                        <div onclick="switchTab('visuals')" class="nav-item" id="nav-visuals">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            <span class="sidebar-text">Visual Board</span>
+                        </div>
+                        <div onclick="switchTab('forecast')" class="nav-item" id="nav-forecast">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                            <span class="sidebar-text font-semibold text-gray-900">KI Forecast</span>
+                        </div>
+                    </nav>
+                </div>
+
+                <div>
+                    <p class="sidebar-header-text text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3 mb-2">Tools</p>
+                    <nav class="space-y-1" id="category-nav">
+                    </nav>
+                </div>
+            </div>
+
+            <div class="sidebar-footer-card mt-auto p-4 vercel-card bg-gray-50 border-dashed">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Status</p>
+                <div id="sidebar-plan-info">
+                    <p class="text-xs font-bold">Standard</p>
+                    <button onclick="openModal('pro-modal')" class="mt-2 w-full btn-v-primary !text-[10px] !py-1">Unlock Pro</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 overflow-y-auto bg-white no-scrollbar">
+            
+            <!-- INSIGHTS VIEW -->
+            <section id="view-insights" class="p-6 md:p-12 animate-slide-up max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tighter">Cockpit</h2>
+                        <p class="text-gray-500 text-sm">Präzise Berechnungen für datengetriebene Entscheidungen.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Metrik suchen..." class="input-v md:w-64" oninput="filterTools(this.value)">
+                    </div>
+                </div>
+
+                <div id="calculator-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Tools appear here -->
+                </div>
+            </section>
+
+            <!-- VISUAL BOARD VIEW -->
+            <section id="view-visuals" class="hidden p-6 md:p-12 animate-slide-up max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold tracking-tighter mb-8">Visual Board</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Unit Economics Deep Dive -->
+                    <div class="vercel-card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold">LTV / CAC Ratio</h3>
+                            <span class="text-xs text-gray-400">Ziel: > 3.0</span>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="ratioChart"></canvas>
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-gray-50 rounded-lg">
+                                <p class="text-[10px] uppercase font-bold text-gray-400">Empfehlung</p>
+                                <p id="ratio-rec" class="text-sm font-medium mt-1">Lade Daten...</p>
+                            </div>
+                            <div class="p-3 bg-gray-50 rounded-lg">
+                                <p class="text-[10px] uppercase font-bold text-gray-400">Health Score</p>
+                                <div id="health-bar" class="w-full h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                                    <div id="health-fill" class="h-full bg-blue-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Burn Rate Heatmap -->
+                    <div class="vercel-card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold">Burn Rate Radar</h3>
+                            <span class="text-xs text-gray-400">Monatlich</span>
+                        </div>
+                        <div class="h-64 flex items-center justify-center">
+                            <div id="burn-radar" class="relative w-48 h-48 rounded-full border-8 border-gray-100 flex items-center justify-center">
+                                <div id="burn-needle" class="absolute w-1 h-24 bg-red-500 origin-bottom transition-transform duration-1000" style="bottom: 50%; transform: rotate(0deg)"></div>
+                                <div class="text-center z-10 bg-white p-2 rounded-lg">
+                                    <p class="text-[10px] uppercase font-bold text-gray-400">Runway</p>
+                                    <p id="radar-runway" class="text-xl font-black">--</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vercel-card p-6 h-80">
+                    <h3 class="font-bold mb-4">Metriken Verlauf</h3>
+                    <canvas id="historyChart"></canvas>
+                </div>
+            </section>
+
+            <!-- FORECAST VIEW (PRO) -->
+            <section id="view-forecast" class="hidden p-6 md:p-12 animate-slide-up max-w-5xl mx-auto relative min-h-[600px]">
+                <div id="forecast-lock" class="blur-lock hidden">
+                    <div class="text-center p-10 vercel-card bg-white max-w-md shadow-2xl">
+                        <span class="badge-pro mb-6 inline-block">Pro Level Only</span>
+                        <h3 class="text-2xl font-bold mb-3">Predictive Forecasting</h3>
+                        <p class="text-sm text-gray-500 mb-8 leading-relaxed">Nutze Monte-Carlo-Simulationen, um dein Wachstum über die nächsten 24 Monate unter verschiedenen Szenarien vorherzusagen.</p>
+                        <button onclick="openModal('pro-modal')" class="btn-v-primary w-full">Unlimited Pro Access</button>
+                    </div>
+                </div>
+                <div class="flex justify-between items-start mb-10">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tighter">KI Growth Engine</h2>
+                        <p class="text-gray-500">Simuliere Szenarien und Cashflow-Engpässe.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-right">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">Confidence Score</p>
+                            <p class="text-xl font-bold text-green-500">94.2%</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="vercel-card p-5">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Wachstum MoM %</label>
+                        <input type="number" id="forecast-target" class="text-xl font-bold mt-1 bg-transparent border-none outline-none w-full" value="12" oninput="initForecastChart()">
+                    </div>
+                    <div class="vercel-card p-5">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Churn Reduktion %</label>
+                        <input type="number" id="forecast-churn" class="text-xl font-bold mt-1 bg-transparent border-none outline-none w-full" value="2" oninput="initForecastChart()">
+                    </div>
+                    <div class="vercel-card p-5 bg-black text-white">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase opacity-60">Proj. ARR (12M)</label>
+                        <p id="proj-arr" class="text-xl font-bold mt-1">€ 1.2M</p>
+                    </div>
+                </div>
+
+                <div class="vercel-card p-6 h-96">
+                    <canvas id="forecastChart"></canvas>
+                </div>
+            </section>
+
+            <!-- SETTINGS -->
+            <section id="view-settings" class="hidden p-6 md:p-12 animate-slide-up max-w-2xl mx-auto">
+                <h2 class="text-3xl font-bold tracking-tighter mb-8">Settings</h2>
+                <div class="space-y-6">
+                    <div class="vercel-card p-6">
+                        <h3 class="font-bold mb-4">Profile Info</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase">Workspace Name</label>
+                                <input type="text" id="input-hub-name" class="input-v mt-1" oninput="updateHubName(this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vercel-card p-6 border-red-100 bg-red-50/30">
+                        <h3 class="font-bold mb-2 text-red-600">Danger Zone</h3>
+                        <p class="text-xs text-gray-500 mb-4">Das Löschen der Daten entfernt alle gespeicherten Metriken aus der Cloud.</p>
+                        <button onclick="clearAllData()" class="btn-v-secondary !text-red-500 !border-red-200 hover:!bg-red-600 hover:!text-white">Alle Daten löschen</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- PRO MODAL -->
+    <div id="pro-modal" class="fixed inset-0 z-[300] hidden flex items-center justify-center p-6 bg-white/90 backdrop-blur-md">
+        <div class="max-w-3xl w-full vercel-card p-8 md:p-12 shadow-2xl relative overflow-hidden bg-white border-2 border-black">
+            <button onclick="closeModal('pro-modal')" class="absolute top-6 right-6 text-gray-400 hover:text-black">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <span class="badge-pro mb-4 inline-block">Enterprise Upgrade</span>
+                    <h2 class="text-4xl font-black tracking-tighter mb-6 leading-none">Bau ein <br>Imperium.</h2>
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 shrink-0 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">Visual Dashboard Pro</p>
+                                <p class="text-xs text-gray-500">Heatmaps, Radar-Charts und Unit Economics Visuals.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 shrink-0 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">KI Forecasting</p>
+                                <p class="text-xs text-gray-500">Statistische Vorhersagen basierend auf Churn und Wachstum.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-8 rounded-2xl flex flex-col justify-between border border-gray-100">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-4">Investment</p>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-6xl font-black tracking-tighter">49€</span>
+                            <span class="text-gray-400 font-medium">/mo</span>
+                        </div>
+                    </div>
+                    <button onclick="upgradePro()" class="btn-v-primary w-full !py-4 text-lg">Pro Freischalten</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'v-hub-ultra-pro';
+
+        let user = null;
+        let isPro = localStorage.getItem('v_pro_v2') === 'true';
+        let companyType = localStorage.getItem('v_type_v2') || null;
+        let activeTab = 'insights';
+        let localData = [];
+        let charts = {};
+
+        const tools = [
+            // SaaS
+            { id:'mrr', name:'MRR Tracker', cat:'SaaS', inputs:[{id:'a',l:'Kunden',p:'100'},{id:'b',l:'Avg Revenue',p:'50'}], formula:(a,b)=>a*b, u:'€' },
+            { id:'ltv', name:'LTV', cat:'SaaS', inputs:[{id:'a',l:'ARPU',p:'50'},{id:'b',l:'Churn %',p:'5'}], formula:(a,b)=>b>0?a/(b/100):0, u:'€' },
+            { id:'churn_impact', name:'Churn Impact', cat:'SaaS', inputs:[{id:'a',l:'Akt. MRR',p:'10k'},{id:'b',l:'Churn %',p:'5'}], formula:(a,b)=>-a*(b/100), u:'€/Mo', pro:true },
+            { id:'magic', name:'Magic Number', cat:'SaaS', inputs:[{id:'a',l:'New MRR',p:'5k'},{id:'b',l:'Prev Spend',p:'10k'}], formula:(a,b)=>b>0?(a*4)/b:0, u:'', pro:true },
+            
+            // Marketing
+            { id:'cac', name:'CAC', cat:'Marketing', inputs:[{id:'a',l:'Spend',p:'5000'},{id:'b',l:'Kunden',p:'50'}], formula:(a,b)=>b>0?a/b:0, u:'€' },
+            { id:'roas', name:'ROAS', cat:'Marketing', inputs:[{id:'a',l:'Umsatz',p:'10k'},{id:'b',l:'Ad Spend',p:'2k'}], formula:(a,b)=>b>0?a/b:0, u:'x' },
+            
+            // Finance
+            { id:'runway', name:'Runway', cat:'Finance', inputs:[{id:'a',l:'Cash',p:'100k'},{id:'b',l:'Burn',p:'10k'}], formula:(a,b)=>b>0?a/b:0, u:' Mo.' },
+            { id:'burn', name:'Burn Rate', cat:'Finance', inputs:[{id:'a',l:'Expenses',p:'25k'},{id:'b',l:'Revenue',p:'15k'}], formula:(a,b)=>a-b, u:'€/Mo' },
+            { id:'dilution', name:'Equity Dilution', cat:'Finance', inputs:[{id:'a',l:'Valuation',p:'5M'},{id:'b',l:'Investment',p:'500k'}], formula:(a,b)=>b/(a+b)*100, u:'%', pro:true },
+            
+            // Ecommerce
+            { id:'aov', name:'AOV (Avg Order)', cat:'Ecommerce', inputs:[{id:'a',l:'Revenue',p:'50k'},{id:'b',l:'Orders',p:'500'}], formula:(a,b)=>b>0?a/b:0, u:'€' },
+            { id:'be', name:'Break Even', cat:'Ecommerce', inputs:[{id:'a',l:'Fix',p:'5k'},{id:'b',l:'Price',p:'100'},{id:'c',l:'Variable',p:'40'}], formula:(a,b,c)=>b-c>0?a/(b-c):0, u:' Stk', pro:true }
+        ];
+
+        window.setup = (type) => {
+            companyType = type;
+            localStorage.setItem('v_type_v2', type);
+            document.getElementById('onboarding').style.display = 'none';
+            init();
+        };
+
+        window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('collapsed');
+
+        window.switchTab = (tab) => {
+            activeTab = tab;
+            ['insights', 'visuals', 'forecast', 'settings'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                document.getElementById(`nav-${v}`)?.classList.remove('active');
+            });
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`nav-${tab}`)?.classList.add('active');
+            
+            if(tab === 'visuals') initVisualBoard();
+            if(tab === 'forecast') initForecastChart();
+        };
+
+        window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+
+        window.upgradePro = () => {
+            isPro = true;
+            localStorage.setItem('v_pro_v2', 'true');
+            closeModal('pro-modal');
+            init();
+        };
+
+        window.updateHubName = (val) => {
+            document.getElementById('hub-name-display').innerText = val || 'Startup Hub';
+            localStorage.setItem('v_hub_name', val);
+        };
+
+        function init() {
+            if(isPro) {
+                document.getElementById('global-pro-badge').classList.remove('hidden');
+                document.getElementById('forecast-lock').classList.add('hidden');
+                document.getElementById('sidebar-plan-info').innerHTML = `<p class="text-xs font-bold text-blue-600">PRO MEMBERSHIP</p>`;
+            } else {
+                document.getElementById('forecast-lock').classList.remove('hidden');
+            }
+            
+            const hubName = localStorage.getItem('v_hub_name') || 'Main Workspace';
+            document.getElementById('input-hub-name').value = hubName;
+            document.getElementById('hub-name-display').innerText = hubName;
+
+            renderCategories();
+            renderTools();
+            initFirebase();
+        }
+
+        function renderCategories() {
+            const nav = document.getElementById('category-nav');
+            const cats = ['Alle', ...new Set(tools.map(t => t.cat))];
+            nav.innerHTML = cats.map(c => `
+                <div onclick="filterByCategory('${c}')" class="nav-item">
+                    <span class="sidebar-text">${c}</span>
+                </div>
+            `).join('');
+        }
+
+        window.filterByCategory = (cat) => renderTools(cat === 'Alle' ? null : cat);
+        window.filterTools = (query) => renderTools(null, query.toLowerCase());
+
+        function renderTools(catFilter = null, searchFilter = null) {
+            const grid = document.getElementById('calculator-grid');
+            grid.innerHTML = '';
+            
+            const filtered = tools.filter(t => {
+                const matchCat = !catFilter || t.cat === catFilter;
+                const matchSearch = !searchFilter || t.name.toLowerCase().includes(searchFilter);
+                return matchCat && matchSearch;
+            });
+
+            filtered.forEach(tool => {
+                const card = document.createElement('div');
+                card.id = `card-${tool.id}`;
+                card.className = 'vercel-card p-6 flex flex-col justify-between min-h-[380px] animate-slide-up';
+                
+                if(tool.pro && !isPro) {
+                    const lock = document.createElement('div');
+                    lock.className = 'blur-lock';
+                    lock.innerHTML = `<div class="text-center"><span class="badge-pro mb-3 inline-block">Pro</span><br><button onclick="openModal('pro-modal')" class="btn-v-primary !text-[10px]">Unlock</button></div>`;
+                    card.appendChild(lock);
+                }
+
+                card.innerHTML += `
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${tool.cat}</span>
+                            ${tool.pro ? '<span class="badge-pro">Pro</span>' : ''}
+                        </div>
+                        <h3 class="text-xl font-bold tracking-tight mb-6">${tool.name}</h3>
+                        <div class="space-y-4">
+                            ${tool.inputs.map(i => `
+                                <div>
+                                    <label class="text-[10px] font-bold text-gray-500 uppercase">${i.l}</label>
+                                    <input type="number" id="in-${tool.id}-${i.id}" class="input-v mt-1" placeholder="${i.p}">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center">
+                        <div class="flex-1">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">Current</p>
+                            <p id="res-${tool.id}" class="text-2xl font-black tracking-tighter">0${tool.u}</p>
+                        </div>
+                        <button id="btn-save-${tool.id}" onclick="saveResult('${tool.id}', '${tool.name}')" class="btn-v-primary !py-2 !px-4">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            <span>Save</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+
+                tool.inputs.forEach(input => {
+                    const el = document.getElementById(`in-${tool.id}-${input.id}`);
+                    el?.addEventListener('input', () => {
+                        const vals = tool.inputs.map(i => parseFloat(document.getElementById(`in-${tool.id}-${i.id}`).value) || 0);
+                        const res = tool.formula(...vals);
+                        const display = document.getElementById(`res-${tool.id}`);
+                        display.innerText = (res % 1 === 0 ? res : res.toFixed(2)).toLocaleString('de-DE') + tool.u;
+                        if(res > 0) display.classList.add('text-blue-600'); else display.classList.remove('text-blue-600');
+                    });
+                });
+            });
+        }
+
+        window.saveResult = async (id, name) => {
+            if (!user) return;
+            const btn = document.getElementById(`btn-save-${id}`);
+            const originalText = btn.querySelector('span').innerText;
+            const resVal = parseFloat(document.getElementById(`res-${id}`).innerText.replace(/[^0-9,.-]+/g,"").replace(",","."));
+            
+            if (isNaN(resVal)) return;
+
+            // Feedback: Loading
+            btn.disabled = true;
+            btn.querySelector('span').innerText = "Saving...";
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'metrics'), { 
+                    type: name, 
+                    value: resVal, 
+                    timestamp: Date.now() 
+                });
+                
+                // Feedback: Success
+                btn.classList.add('!bg-blue-600');
+                btn.querySelector('span').innerText = "Saved!";
+                document.getElementById(`card-${id}`).classList.add('pulse-success');
+                
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.classList.remove('!bg-blue-600');
+                    btn.querySelector('span').innerText = originalText;
+                    document.getElementById(`card-${id}`).classList.remove('pulse-success');
+                }, 2000);
+
+            } catch(e) {
+                btn.disabled = false;
+                btn.querySelector('span').innerText = "Error";
+                console.error(e);
+            }
+        };
+
+        function initFirebase() {
+            onAuthStateChanged(auth, async (u) => {
+                user = u;
+                if (!u) { await signInAnonymously(auth); return; }
+                
+                const q = query(collection(db, 'artifacts', appId, 'users', user.uid, 'metrics'));
+                onSnapshot(q, (snap) => {
+                    localData = snap.docs.map(d => d.data());
+                    if(activeTab === 'visuals') initVisualBoard();
+                });
+            });
+        }
+
+        function initVisualBoard() {
+            // LTV/CAC Ratio Logic
+            const ltvData = localData.filter(d => d.type === 'LTV').pop()?.value || 0;
+            const cacData = localData.filter(d => d.type === 'CAC').pop()?.value || 0;
+            const ratio = cacData > 0 ? ltvData / cacData : 0;
+            
+            const ratioCtx = document.getElementById('ratioChart').getContext('2d');
+            if(charts.ratio) charts.ratio.destroy();
+            charts.ratio = new Chart(ratioCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ratio', 'Target Gap'],
+                    datasets: [{
+                        data: [Math.min(ratio, 5), Math.max(0, 5 - ratio)],
+                        backgroundColor: [ratio >= 3 ? '#0070f3' : '#ee0000', '#f1f1f1'],
+                        borderWidth: 0,
+                        circumference: 180,
+                        rotation: 270
+                    }]
+                },
+                options: { cutout: '80%', plugins: { legend: { display: false } } }
+            });
+
+            document.getElementById('ratio-rec').innerText = ratio >= 3 ? "Exzellent skalierbar." : (ratio > 0 ? "CAC senken oder LTV erhöhen." : "Keine Daten.");
+            document.getElementById('health-fill').style.width = `${Math.min((ratio/3)*100, 100)}%`;
+
+            // Burn Radar
+            const burnVal = localData.filter(d => d.type === 'Burn Rate').pop()?.value || 0;
+            const cashVal = localData.filter(d => d.type === 'Runway').filter(d => d.value > 0).pop()?.value || 12; // fallback runway
+            const degree = Math.min((burnVal / 50000) * 180, 180);
+            document.getElementById('burn-needle').style.transform = `rotate(${degree - 90}deg)`;
+            document.getElementById('radar-runway').innerText = cashVal.toFixed(1) + "M";
+
+            // History Line
+            const sorted = [...localData].sort((a,b) => a.timestamp - b.timestamp);
+            const historyCtx = document.getElementById('historyChart').getContext('2d');
+            if(charts.history) charts.history.destroy();
+            charts.history = new Chart(historyCtx, {
+                type: 'line',
+                data: {
+                    labels: sorted.map(d => new Date(d.timestamp).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Performance Index',
+                        data: sorted.map(d => d.value),
+                        borderColor: '#000',
+                        tension: 0.3,
+                        pointRadius: 2,
+                        borderWidth: 2
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false } } }
+            });
+        }
+
+        function initForecastChart() {
+            if(!isPro) return;
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            const target = parseFloat(document.getElementById('forecast-target').value) / 100 || 0.12;
+            const churn = parseFloat(document.getElementById('forecast-churn').value) / 100 || 0.02;
+            
+            const labels = ['Now', '3M', '6M', '9M', '12M', '15M', '18M', '21M', '24M'];
+            let current = 100000;
+            const data = labels.map(() => {
+                current = current * (1 + (target - churn));
+                return current;
+            });
+
+            document.getElementById('proj-arr').innerText = "€ " + (current / 1000000).toFixed(1) + "M";
+
+            if(charts.forecast) charts.forecast.destroy();
+            charts.forecast = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Projected Growth',
+                        data: data,
+                        borderColor: '#0070f3',
+                        backgroundColor: 'rgba(0, 112, 243, 0.05)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        window.clearAllData = async () => {
+            if(confirm("Bist du sicher? Alle Cloud-Daten werden gelöscht.")) {
+                localStorage.clear();
+                const q = query(collection(db, 'artifacts', appId, 'users', user.uid, 'metrics'));
+                const snap = await getDocs(q);
+                snap.forEach(async (d) => await deleteDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'metrics', d.id)));
+                location.reload();
+            }
+        };
+
+        if(companyType) {
+            document.getElementById('onboarding').style.display = 'none';
+            init();
+        }
+    </script>
+</body>
+</html>
