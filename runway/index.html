@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RUNWAY — Plan & Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ─────────────────────────────────────────
+   TOKENS
+───────────────────────────────────────── */
+:root {
+  --bg:        #09090b;
+  --s1:        #111116;
+  --s2:        #18181f;
+  --s3:        #242430;
+  --s4:        #32323f;
+  --t0:        #ffffff;
+  --t1:        #c8c8d4;
+  --t2:        #8080906;
+  --t3:        #808090;
+  --t4:        #484858;
+  --accent:    #2563eb;
+  --ac-lo:     rgba(37,99,235,0.07);
+  --ac-md:     rgba(37,99,235,0.14);
+  --ac-hi:     rgba(37,99,235,0.28);
+  --green:     #16a34a;
+  --gr-lo:     rgba(22,163,74,0.08);
+  --line:      rgba(255,255,255,0.065);
+  --line-hi:   rgba(255,255,255,0.11);
+  --r3: 3px; --r6: 6px; --r10: 10px; --r14: 14px; --r20: 20px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Geist',sans-serif;
+  background:var(--bg);
+  color:var(--t0);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* CURSOR */
+#c{position:fixed;width:7px;height:7px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+#cr{position:fixed;width:30px;height:30px;border-radius:50%;border:1px solid rgba(37,99,235,0.4);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .15s,height .15s,border-color .15s}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:58px;padding:0 44px;
+  display:grid;grid-template-columns:180px 1fr 180px;align-items:center;
+  background:rgba(9,9,11,0.85);backdrop-filter:blur(20px) saturate(1.5);
+  border-bottom:1px solid var(--line);
+}
+.n-logo{
+  display:flex;align-items:center;gap:9px;
+  font-weight:600;font-size:14px;letter-spacing:-.2px;color:var(--t0);text-decoration:none;
+}
+.n-links{display:flex;justify-content:center;gap:32px}
+.n-link{font-size:13px;color:var(--t3);text-decoration:none;transition:color .18s;letter-spacing:-.1px}
+.n-link:hover{color:var(--t0)}
+.n-right{display:flex;justify-content:flex-end;align-items:center;gap:10px}
+.btn-soft{
+  font-family:'Geist',sans-serif;font-size:13px;font-weight:400;
+  color:var(--t3);background:none;border:none;cursor:none;padding:6px 10px;
+  transition:color .18s;
+}
+.btn-soft:hover{color:var(--t0)}
+.btn-solid{
+  font-family:'Geist',sans-serif;font-size:13px;font-weight:500;
+  color:#fff;background:var(--accent);border:none;cursor:none;
+  padding:7px 16px;border-radius:var(--r6);transition:opacity .18s,transform .18s;
+}
+.btn-solid:hover{opacity:.88;transform:translateY(-1px)}
+
+/* ─── HERO ─── */
+.hero{
+  min-height:100svh;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;gap:0;
+  padding:0;padding-top:58px;
+  position:relative;overflow:hidden;
+}
+
+/* Left text column */
+.hero-left{
+  padding:80px 64px 80px 80px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;z-index:2;
+}
+
+/* Right illustration column */
+.hero-right{
+  padding:80px 80px 80px 0;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:2;
+}
+
+/* Subtle gradient only in left half */
+.hero::before{
+  content:'';position:absolute;
+  top:0;left:0;bottom:0;width:60%;
+  background:radial-gradient(ellipse 70% 60% at 30% 45%, rgba(37,99,235,0.09) 0%, transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* Grid lines */
+.hero-grid{
+  position:absolute;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size:72px 72px;
+  mask-image:linear-gradient(to right, black 40%, transparent 100%);
+  pointer-events:none;
+}
+
+/* Hero divider */
+.hero-divider{
+  position:absolute;top:80px;bottom:80px;left:50%;width:1px;
+  background:linear-gradient(to bottom, transparent, var(--line-hi) 20%, var(--line-hi) 80%, transparent);
+  z-index:1;pointer-events:none;
+}
+
+.hero-eyebrow{
+  display:flex;align-items:center;gap:10px;margin-bottom:28px;
+  font-family:'Geist Mono',monospace;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--t3);
+  animation:fadeUp .8s cubic-bezier(.16,1,.3,1) both;
+}
+.ew-pulse{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2.4s ease-in-out infinite}
+.ew-line{width:28px;height:1px;background:var(--accent)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+
+.hero-title{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(52px,6vw,88px);
+  line-height:.95;letter-spacing:-3px;
+  margin-bottom:28px;
+  animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .07s both;
+}
+.hero-title em{font-style:italic;color:var(--accent)}
+.hero-title .dim{color:var(--t3)}
+
+.hero-body{
+  font-size:16px;font-weight:300;color:var(--t1);
+  line-height:1.72;max-width:420px;margin-bottom:40px;
+  animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .14s both;
+}
+
+.hero-btns{
+  display:flex;gap:12px;
+  animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .21s both;
+}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:'Geist',sans-serif;font-size:13px;font-weight:500;
+  color:#fff;background:var(--accent);
+  padding:11px 22px;border-radius:var(--r6);
+  border:none;cursor:none;transition:all .22s;
+}
+.btn-primary:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 12px 40px rgba(37,99,235,.28)}
+.btn-primary svg{transition:transform .22s}
+.btn-primary:hover svg{transform:translateX(3px)}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Geist',sans-serif;font-size:13px;font-weight:400;
+  color:var(--t1);background:transparent;
+  padding:11px 18px;border-radius:var(--r6);
+  border:1px solid var(--line-hi);cursor:none;transition:all .22s;
+}
+.btn-outline:hover{color:var(--t0);border-color:var(--s4);background:var(--s1)}
+
+/* Hero metrics strip at bottom */
+.hero-metrics{
+  position:absolute;bottom:0;left:0;right:0;z-index:2;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--line);
+  animation:fadeUp .8s cubic-bezier(.16,1,.3,1) .35s both;
+}
+.hm-item{
+  padding:24px 32px;
+  border-right:1px solid var(--line);
+}
+.hm-item:last-child{border-right:none}
+.hm-val{
+  font-family:'Instrument Serif',serif;font-size:36px;letter-spacing:-1px;
+  line-height:1;margin-bottom:5px;color:var(--t0);
+}
+.hm-lbl{
+  font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--t3);
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+/* ─── MARQUEE ─── */
+.marquee{
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  overflow:hidden;background:var(--s1);padding:14px 0;
+}
+.marquee-track{display:flex;animation:scroll 34s linear infinite;white-space:nowrap}
+.marquee-item{
+  display:inline-flex;align-items:center;
+  font-family:'Geist Mono',monospace;font-size:10px;
+  letter-spacing:1.8px;text-transform:uppercase;color:var(--t4);
+  padding:0 36px;
+}
+.marquee-item::after{content:'·';margin-left:36px;color:var(--accent)}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ─── SECTIONS ─── */
+.section{padding:112px 80px;border-top:1px solid var(--line)}
+.section--alt{background:var(--s1)}
+
+.s-label{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Geist Mono',monospace;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:20px;
+}
+.s-num{color:var(--accent)}
+.s-title{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(36px,4.5vw,60px);letter-spacing:-2px;line-height:1;
+  margin-bottom:18px;
+}
+.s-body{font-size:16px;font-weight:300;color:var(--t1);line-height:1.72;max-width:460px}
+
+/* ─── PLAN ─── */
+.plan-wrap{max-width:1200px;margin:0 auto}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
+.plan-feats{display:flex;flex-direction:column;padding-top:8px}
+.pf{
+  display:grid;grid-template-columns:40px 1fr;gap:18px;
+  padding:22px 0;border-bottom:1px solid var(--line);
+  transition:padding-left .25s;
+}
+.pf:first-child{border-top:1px solid var(--line)}
+.pf:hover{padding-left:5px}
+.pf-n{font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--accent);padding-top:2px}
+.pf-t{font-size:14px;font-weight:500;letter-spacing:-.2px;margin-bottom:4px}
+.pf-d{font-size:13px;color:var(--t3);line-height:1.6}
+
+/* ─── BUILD ─── */
+.build-wrap{max-width:1200px;margin:0 auto}
+.build-intro{display:grid;grid-template-columns:1fr 1fr;gap:96px;margin-bottom:64px;align-items:end}
+.build-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--s3);border-radius:var(--r14);overflow:hidden;
+}
+.bc{
+  background:var(--s1);padding:32px;position:relative;overflow:hidden;
+  transition:background .25s;
+}
+.bc::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right,transparent,var(--accent),transparent);
+  opacity:0;transition:opacity .25s;
+}
+.bc:hover{background:var(--bg)}
+.bc:hover::after{opacity:1}
+.bc-eye{
+  font-family:'Geist Mono',monospace;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);
+  margin-bottom:16px;display:flex;align-items:center;gap:7px;
+}
+.bc-dot{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.6}
+.bc-t{font-size:16px;font-weight:500;letter-spacing:-.3px;margin-bottom:10px}
+.bc-d{font-size:13px;color:var(--t3);line-height:1.62;margin-bottom:20px}
+.bc-tags{display:flex;flex-wrap:wrap;gap:5px}
+.bc-tag{
+  font-family:'Geist Mono',monospace;font-size:10px;
+  color:var(--accent);background:var(--ac-lo);border:1px solid var(--ac-md);
+  padding:2px 7px;border-radius:var(--r3);
+}
+
+/* ─── AUDIENCE ─── */
+.aud-wrap{max-width:1200px;margin:0 auto}
+.aud-intro{display:grid;grid-template-columns:1fr 1fr;gap:96px;margin-bottom:64px;align-items:end}
+.aud-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.aud-card{
+  border:1px solid var(--line);border-radius:var(--r14);padding:36px;
+  background:var(--s1);position:relative;overflow:hidden;
+  transition:border-color .25s,transform .3s;
+}
+.aud-card:hover{border-color:var(--line-hi);transform:translateY(-3px)}
+.aud-card-stripe{
+  position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:var(--accent);opacity:0;transition:opacity .25s;
+}
+.aud-card:hover .aud-card-stripe{opacity:1}
+.aud-icon{margin-bottom:24px}
+.aud-tag{font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.aud-name{font-size:22px;font-weight:500;letter-spacing:-.6px;margin-bottom:12px}
+.aud-desc{font-size:13px;color:var(--t3);line-height:1.65}
+
+/* ─── PRICING ─── */
+.pr-wrap{max-width:1100px;margin:0 auto}
+.pr-head{text-align:center;max-width:500px;margin:0 auto 72px}
+.pr-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--s3);border-radius:var(--r14);overflow:hidden;
+}
+.pr-card{background:var(--s1);padding:44px;position:relative}
+.pr-card.feat{background:var(--bg)}
+.pr-badge{
+  position:absolute;top:24px;right:24px;
+  font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--accent);background:var(--ac-lo);border:1px solid var(--ac-md);
+  padding:3px 9px;border-radius:var(--r3);
+}
+.pr-name{font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:18px}
+.pr-price{font-family:'Instrument Serif',serif;font-size:54px;letter-spacing:-2px;line-height:1;margin-bottom:4px}
+.pr-price sup{font-size:22px;font-family:'Geist',sans-serif;font-weight:300;letter-spacing:0;vertical-align:top;margin-top:10px}
+.pr-per{font-size:13px;color:var(--t3);margin-bottom:28px}
+.pr-div{border:none;border-top:1px solid var(--line);margin-bottom:28px}
+.pr-feat{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--t1);margin-bottom:12px;line-height:1.5}
+.pr-check{color:var(--green);flex-shrink:0}
+.pr-off{color:var(--t4);opacity:.5}
+.btn-pr{
+  display:block;width:100%;margin-top:36px;
+  font-family:'Geist',sans-serif;font-size:13px;font-weight:500;
+  text-align:center;padding:11px 0;border-radius:var(--r6);
+  cursor:none;transition:all .22s;
+  border:1px solid var(--line-hi);background:rgba(255,255,255,.03);color:var(--t0);
+}
+.btn-pr:hover{background:rgba(255,255,255,.07);border-color:var(--s4)}
+.btn-pr.pr-solid{background:var(--accent);border-color:transparent}
+.btn-pr.pr-solid:hover{opacity:.88;box-shadow:0 10px 36px rgba(37,99,235,.25)}
+
+/* ─── CTA ─── */
+.cta{
+  padding:140px 80px;text-align:center;position:relative;overflow:hidden;
+  border-top:1px solid var(--line);
+}
+.cta-glow{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:700px;height:400px;
+  background:radial-gradient(ellipse,rgba(37,99,235,.11) 0%,transparent 65%);
+  pointer-events:none;
+}
+.cta-title{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(40px,5.5vw,72px);letter-spacing:-2px;line-height:1;
+  margin-bottom:24px;position:relative;z-index:1;
+}
+.cta-body{font-size:16px;font-weight:300;color:var(--t1);max-width:400px;margin:0 auto 40px;line-height:1.7;position:relative;z-index:1}
+.cta-btns{display:flex;gap:12px;justify-content:center;position:relative;z-index:1}
+
+/* FOOTER */
+footer{
+  padding:32px 80px;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+}
+.f-logo{font-weight:600;font-size:13px;letter-spacing:-.2px}
+.f-logo span{color:var(--accent)}
+.f-links{display:flex;gap:24px}
+.f-link{font-size:12px;color:var(--t3);text-decoration:none;transition:color .18s}
+.f-link:hover{color:var(--t0)}
+.f-copy{font-size:11px;color:var(--t4);font-family:'Geist Mono',monospace;text-align:right;letter-spacing:.4px}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* SVG anim */
+.dash-anim{stroke-dasharray:6 4;animation:dash 2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-20}}
+.blink-dot{animation:bdot 2.4s ease-in-out infinite}
+.blink-dot-2{animation:bdot 2.4s ease-in-out .6s infinite}
+.blink-dot-3{animation:bdot 2.4s ease-in-out 1.2s infinite}
+@keyframes bdot{0%,100%{opacity:.25}50%{opacity:1}}
+.draw{stroke-dasharray:800;stroke-dashoffset:800;animation:draw 1.8s ease .5s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+@media(max-width:1100px){
+  nav{padding:0 24px;grid-template-columns:auto 1fr auto}
+  .n-links{display:none}
+  .hero{grid-template-columns:1fr;min-height:auto}
+  .hero-left{padding:80px 32px 40px}
+  .hero-right{display:none}
+  .hero-divider{display:none}
+  .hero-metrics{position:static;grid-template-columns:repeat(2,1fr)}
+  .section{padding:72px 32px}
+  .plan-grid,.build-intro,.aud-intro{grid-template-columns:1fr;gap:48px}
+  .build-grid,.aud-grid,.pr-grid{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr;gap:20px;text-align:center}
+  .f-copy{text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div id="c"></div>
+<div id="cr"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="n-logo">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M3 14L9 2L15 14" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 10H12" stroke="rgba(37,99,235,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    RUNWAY
+  </a>
+  <div class="n-links">
+    <a href="#plan" class="n-link">Plan</a>
+    <a href="#build" class="n-link">Build</a>
+    <a href="#use-cases" class="n-link">Use Cases</a>
+    <a href="#pricing" class="n-link">Pricing</a>
+    <a href="#" class="n-link">Docs</a>
+  </div>
+  <div class="n-right">
+    <button class="btn-soft">Log in</button>
+    <button class="btn-solid">Get started →</button>
+  </div>
+</nav>
+
+<!-- HERO — two-column, illustration never overlaps text -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-divider"></div>
+
+  <!-- LEFT: text -->
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <div class="ew-pulse"></div>
+      <div class="ew-line"></div>
+      AI Business Architecture · v1.0
+    </div>
+
+    <h1 class="hero-title">
+      Your venture's<br>
+      <em>runway</em><br>
+      <span class="dim">starts here.</span>
+    </h1>
+
+    <p class="hero-body">
+      No analysis paralysis. No operational overwhelm. RUNWAY generates validated business models and operational structures in seconds — not months.
+    </p>
+
+    <div class="hero-btns">
+      <button class="btn-primary">
+        Start building
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2.5 7H11.5M11.5 7L8 3.5M11.5 7L8 10.5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="btn-outline">Watch demo</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: dashboard illustration — clean, monochromatic -->
+  <div class="hero-right">
+    <svg viewBox="0 0 440 480" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:440px;">
+      <defs>
+        <linearGradient id="fade-b" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.06"/>
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02"/>
+        </linearGradient>
+        <linearGradient id="accent-line" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#2563eb" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="progress-a" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#2563eb" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#2563eb" stop-opacity="0.2"/>
+        </linearGradient>
+        <clipPath id="card-clip">
+          <rect width="440" height="480" rx="14"/>
+        </clipPath>
+      </defs>
+
+      <!-- Card shell -->
+      <rect width="440" height="480" rx="14" fill="url(#fade-b)" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
+      <rect width="440" height="480" rx="14" fill="none" clip-path="url(#card-clip)"/>
+
+      <!-- Top bar -->
+      <rect width="440" height="42" rx="0" fill="rgba(255,255,255,0.025)"/>
+      <line x1="0" y1="42" x2="440" y2="42" stroke="rgba(255,255,255,0.07)"/>
+      <!-- Dots -->
+      <circle cx="18" cy="21" r="4.5" fill="rgba(255,255,255,0.12)"/>
+      <circle cx="32" cy="21" r="4.5" fill="rgba(255,255,255,0.08)"/>
+      <circle cx="46" cy="21" r="4.5" fill="rgba(255,255,255,0.05)"/>
+      <!-- URL bar -->
+      <rect x="130" y="13" width="180" height="16" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+      <text x="220" y="25" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.28)">runway.app / venture</text>
+
+      <!-- Sidebar -->
+      <rect x="0" y="42" width="110" height="438" fill="rgba(0,0,0,0.18)" stroke="none"/>
+      <line x1="110" y1="42" x2="110" y2="480" stroke="rgba(255,255,255,0.06)"/>
+
+      <!-- Logo in sidebar -->
+      <text x="16" y="66" font-family="'Geist',sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.7)">RUNWAY</text>
+
+      <!-- Sidebar nav items -->
+      <rect x="8" y="76" width="94" height="22" rx="5" fill="rgba(37,99,235,0.15)" stroke="rgba(37,99,235,0.2)" stroke-width="1"/>
+      <text x="18" y="91" font-family="'Geist',monospace" font-size="9" fill="#93b4ff">Overview</text>
+
+      <text x="18" y="115" font-family="'Geist',monospace" font-size="9" fill="rgba(255,255,255,0.3)">PLAN</text>
+      <text x="18" y="133" font-family="'Geist',monospace" font-size="9" fill="rgba(255,255,255,0.3)">BUILD</text>
+      <text x="18" y="151" font-family="'Geist',monospace" font-size="9" fill="rgba(255,255,255,0.3)">Archive</text>
+      <text x="18" y="169" font-family="'Geist',monospace" font-size="9" fill="rgba(255,255,255,0.3)">KPIs</text>
+
+      <!-- Mode toggle at bottom of sidebar -->
+      <rect x="8" y="340" width="94" height="28" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <rect x="10" y="342" width="44" height="24" rx="5" fill="rgba(37,99,235,0.6)"/>
+      <text x="32" y="358" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" font-weight="600" fill="#fff">PLAN</text>
+      <text x="80" y="358" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.3)">BUILD</text>
+
+      <!-- Main content area -->
+      <!-- Header -->
+      <text x="126" y="65" font-family="'Geist',sans-serif" font-size="14" font-weight="500" fill="rgba(255,255,255,0.85)">PLAN Blueprint</text>
+      <text x="126" y="79" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.2)">SaaS B2B · v2.3 · Auto-saved</text>
+
+      <!-- Divider -->
+      <line x1="118" y1="88" x2="432" y2="88" stroke="rgba(255,255,255,0.06)"/>
+
+      <!-- Row 1: two stat cards -->
+      <!-- Card A -->
+      <rect x="120" y="96" width="147" height="86" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+      <text x="134" y="114" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.28)" letter-spacing="1">MARKET SIZE</text>
+      <text x="134" y="138" font-family="'Instrument Serif',serif" font-size="28" fill="rgba(255,255,255,0.9)">€2.4B</text>
+      <text x="134" y="152" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.25)">TAM</text>
+      <!-- Progress -->
+      <rect x="134" y="163" width="119" height="3" rx="1.5" fill="rgba(255,255,255,0.06)"/>
+      <rect x="134" y="163" width="77" height="3" rx="1.5" fill="url(#progress-a)"/>
+
+      <!-- Card B -->
+      <rect x="277" y="96" width="155" height="86" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+      <text x="291" y="114" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.28)" letter-spacing="1">BREAK-EVEN</text>
+      <text x="291" y="138" font-family="'Instrument Serif',serif" font-size="28" fill="rgba(255,255,255,0.9)">M14</text>
+      <text x="291" y="152" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.25)">LTV/CAC: 12×</text>
+      <rect x="291" y="163" width="127" height="3" rx="1.5" fill="rgba(255,255,255,0.06)"/>
+      <rect x="291" y="163" width="60" height="3" rx="1.5" fill="rgba(37,99,235,0.5)"/>
+
+      <!-- Row 2: Roadmap timeline -->
+      <rect x="120" y="192" width="312" height="90" rx="8" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+      <text x="134" y="210" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.28)" letter-spacing="1">ROADMAP</text>
+
+      <!-- Timeline track -->
+      <line x1="140" y1="242" x2="416" y2="242" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <!-- Filled segment -->
+      <line x1="140" y1="242" x2="300" y2="242" stroke="rgba(37,99,235,0.6)" stroke-width="2" class="draw"/>
+
+      <!-- Nodes -->
+      <circle cx="140" cy="242" r="4" fill="rgba(37,99,235,0.9)" class="blink-dot"/>
+      <circle cx="208" cy="242" r="4" fill="rgba(37,99,235,0.6)" class="blink-dot-2"/>
+      <circle cx="300" cy="242" r="5" fill="rgba(37,99,235,0.85)"/>
+      <circle cx="416" cy="242" r="4" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+
+      <!-- Labels below -->
+      <text x="140" y="258" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.3)">M1</text>
+      <text x="208" y="258" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.3)">M3</text>
+      <text x="300" y="258" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.55)">M9 ✓</text>
+      <text x="416" y="258" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.18)">M12</text>
+
+      <!-- Labels above -->
+      <text x="140" y="229" text-anchor="middle" font-family="'Geist',sans-serif" font-size="8.5" fill="rgba(255,255,255,0.4)">Vision</text>
+      <text x="208" y="229" text-anchor="middle" font-family="'Geist',sans-serif" font-size="8.5" fill="rgba(255,255,255,0.4)">MVP</text>
+      <text x="300" y="229" text-anchor="middle" font-family="'Geist',sans-serif" font-size="8.5" fill="rgba(255,255,255,0.7)">Scale</text>
+
+      <!-- Row 3: Budget allocation -->
+      <rect x="120" y="292" width="147" height="82" rx="8" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+      <text x="134" y="310" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.28)" letter-spacing="1">BUDGET</text>
+      <!-- Stacked bars -->
+      <rect x="134" y="318" width="119" height="10" rx="2" fill="rgba(255,255,255,0.05)"/>
+      <rect x="134" y="318" width="48" height="10" rx="2" fill="rgba(37,99,235,0.55)"/>
+      <rect x="182" y="318" width="36" height="10" rx="2" fill="rgba(37,99,235,0.3)"/>
+      <rect x="218" y="318" width="35" height="10" rx="2" fill="rgba(37,99,235,0.18)"/>
+      <text x="134" y="340" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(37,99,235,0.8)">40%</text>
+      <text x="164" y="340" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.25)">30%</text>
+      <text x="196" y="340" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.15)">30%</text>
+      <text x="134" y="353" font-family="'Geist',sans-serif" font-size="8" fill="rgba(255,255,255,0.22)">Dev · Mkt · Ops</text>
+      <text x="134" y="365" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.15)">RISK: Low · 3 vars</text>
+
+      <!-- KPI card -->
+      <rect x="277" y="292" width="155" height="82" rx="8" fill="rgba(37,99,235,0.06)" stroke="rgba(37,99,235,0.15)" stroke-width="1"/>
+      <text x="291" y="310" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(37,99,235,0.7)" letter-spacing="1">NORTH STAR KPI</text>
+      <text x="291" y="338" font-family="'Instrument Serif',serif" font-size="30" fill="rgba(255,255,255,0.85)">MRR</text>
+      <text x="291" y="354" font-family="'Geist Mono',monospace" font-size="8.5" fill="rgba(255,255,255,0.4)">+23% MoM target</text>
+      <text x="291" y="368" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.2)">CAC: €240 · LTV: €2.880</text>
+
+      <!-- Archive strip -->
+      <rect x="120" y="386" width="312" height="72" rx="8" fill="rgba(255,255,255,0.015)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="134" y="404" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.2)" letter-spacing="1">VENTURE ARCHIVE</text>
+
+      <!-- Archive chips -->
+      <rect x="134" y="412" width="72" height="34" rx="5" fill="rgba(37,99,235,0.1)" stroke="rgba(37,99,235,0.2)" stroke-width="1"/>
+      <text x="148" y="428" font-family="'Geist',sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">SaaS B2B</text>
+      <text x="148" y="440" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.7)">v2.3</text>
+
+      <rect x="214" y="412" width="72" height="34" rx="5" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+      <text x="228" y="428" font-family="'Geist',sans-serif" font-size="9" fill="rgba(255,255,255,0.35)">E-Comm</text>
+      <text x="228" y="440" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.45)">v1.1</text>
+
+      <rect x="294" y="412" width="72" height="34" rx="5" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <text x="308" y="428" font-family="'Geist',sans-serif" font-size="9" fill="rgba(255,255,255,0.2)">HealthTech</text>
+      <text x="308" y="440" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.22)">draft</text>
+
+      <rect x="374" y="412" width="46" height="34" rx="5" fill="rgba(255,255,255,0.015)" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="397" y="433" text-anchor="middle" font-family="'Geist',sans-serif" font-size="16" fill="rgba(255,255,255,0.12)">+</text>
+
+      <!-- AI feedback bar -->
+      <rect x="120" y="466" width="312" height="1" fill="rgba(255,255,255,0.05)"/>
+      <line x1="120" y1="466" x2="312" y2="466" stroke="rgba(37,99,235,0.4)" stroke-width="1" class="dash-anim"/>
+      <circle cx="122" cy="474" r="3" fill="rgba(37,99,235,0.6)" class="blink-dot-3"/>
+      <text x="132" y="477" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.18)">AI feedback loop active · live market data</text>
+    </svg>
+  </div>
+
+  <!-- Metrics strip pinned to bottom -->
+  <div class="hero-metrics">
+    <div class="hm-item">
+      <div class="hm-val">8s</div>
+      <div class="hm-lbl">To full business plan</div>
+    </div>
+    <div class="hm-item">
+      <div class="hm-val">2</div>
+      <div class="hm-lbl">Integrated engines</div>
+    </div>
+    <div class="hm-item">
+      <div class="hm-val">∞</div>
+      <div class="hm-lbl">Scenarios archived</div>
+    </div>
+    <div class="hm-item">
+      <div class="hm-val">100%</div>
+      <div class="hm-lbl">Framework-validated</div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="marquee-item">Vision Synthesis</span>
+    <span class="marquee-item">Sequential Roadmap</span>
+    <span class="marquee-item">Budget Allocation</span>
+    <span class="marquee-item">KPI Architecture</span>
+    <span class="marquee-item">TAM · SAM · SOM</span>
+    <span class="marquee-item">Risk Matrix</span>
+    <span class="marquee-item">Pricing Models</span>
+    <span class="marquee-item">Unit Economics</span>
+    <span class="marquee-item">Legal Structure</span>
+    <span class="marquee-item">Tech Stack</span>
+    <span class="marquee-item">Tactic Repository</span>
+    <span class="marquee-item">Venture Archive</span>
+    <span class="marquee-item">Vision Synthesis</span>
+    <span class="marquee-item">Sequential Roadmap</span>
+    <span class="marquee-item">Budget Allocation</span>
+    <span class="marquee-item">KPI Architecture</span>
+    <span class="marquee-item">TAM · SAM · SOM</span>
+    <span class="marquee-item">Risk Matrix</span>
+    <span class="marquee-item">Pricing Models</span>
+    <span class="marquee-item">Unit Economics</span>
+    <span class="marquee-item">Legal Structure</span>
+    <span class="marquee-item">Tech Stack</span>
+    <span class="marquee-item">Tactic Repository</span>
+    <span class="marquee-item">Venture Archive</span>
+  </div>
+</div>
+
+<!-- PLAN -->
+<section class="section" id="plan">
+  <div class="plan-wrap">
+    <div class="plan-grid">
+
+      <!-- Left: header + illustration -->
+      <div>
+        <div class="s-label"><span class="s-num">01</span> PLAN</div>
+        <h2 class="s-title">The strategic<br>blueprint.</h2>
+        <p class="s-body">PLAN computes your market logic and defines the long-term trajectory — the foundation everything else is built on.</p>
+
+        <!-- Minimal PLAN illustration: timeline + budget + market -->
+        <div class="reveal" style="margin-top:48px;">
+          <svg viewBox="0 0 380 220" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+            <defs>
+              <linearGradient id="pg" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="rgba(37,99,235,0.7)"/>
+                <stop offset="100%" stop-color="rgba(37,99,235,0.15)"/>
+              </linearGradient>
+            </defs>
+
+            <rect width="380" height="220" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+
+            <!-- Section: Roadmap -->
+            <text x="20" y="26" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.22)" letter-spacing="1.5">SEQUENTIAL ROADMAP</text>
+
+            <line x1="20" y1="50" x2="360" y2="50" stroke="rgba(255,255,255,0.05)"/>
+            <line x1="20" y1="50" x2="248" y2="50" stroke="url(#pg)" stroke-width="2" class="draw"/>
+
+            <circle cx="20"  cy="50" r="4.5" fill="rgba(37,99,235,0.9)" class="blink-dot"/>
+            <circle cx="114" cy="50" r="4.5" fill="rgba(37,99,235,0.65)" class="blink-dot-2"/>
+            <circle cx="248" cy="50" r="5"   fill="rgba(37,99,235,0.85)"/>
+            <circle cx="360" cy="50" r="4"   fill="transparent" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+
+            <text x="20"  y="38" text-anchor="middle" font-family="'Geist',sans-serif" font-size="8.5" fill="rgba(255,255,255,0.38)">Vision</text>
+            <text x="114" y="38" text-anchor="middle" font-family="'Geist',sans-serif" font-size="8.5" fill="rgba(255,255,255,0.38)">MVP</text>
+            <text x="248" y="38" text-anchor="middle" font-family="'Geist',sans-serif" font-size="8.5" fill="rgba(255,255,255,0.65)">Scale</text>
+            <text x="20"  y="64" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.22)">M1</text>
+            <text x="114" y="64" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.22)">M3</text>
+            <text x="248" y="64" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.45)">M9</text>
+            <text x="360" y="64" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="7.5" fill="rgba(255,255,255,0.14)">M12</text>
+
+            <!-- Divider -->
+            <line x1="20" y1="82" x2="360" y2="82" stroke="rgba(255,255,255,0.05)"/>
+
+            <!-- Section: Budget -->
+            <text x="20" y="97" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.22)" letter-spacing="1.5">BUDGET ALLOCATION</text>
+
+            <rect x="20" y="106" width="340" height="11" rx="2" fill="rgba(255,255,255,0.04)"/>
+            <rect x="20" y="106" width="136" height="11" rx="2" fill="rgba(37,99,235,0.55)"/>
+            <rect x="156" y="106" width="102" height="11" rx="2" fill="rgba(37,99,235,0.28)"/>
+            <rect x="258" y="106" width="102" height="11" rx="2" fill="rgba(37,99,235,0.14)"/>
+
+            <text x="88"  y="129" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.45)">40% Dev</text>
+            <text x="207" y="129" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.3)">30% Mkt</text>
+            <text x="309" y="129" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.2)">30% Ops</text>
+
+            <!-- Divider -->
+            <line x1="20" y1="144" x2="360" y2="144" stroke="rgba(255,255,255,0.05)"/>
+
+            <!-- Section: Market -->
+            <text x="20" y="159" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.22)" letter-spacing="1.5">MARKET PARAMETERS</text>
+
+            <!-- Three metric columns -->
+            <rect x="20" y="168" width="100" height="38" rx="6" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <text x="32" y="182" font-family="'Geist Mono',monospace" font-size="7" fill="rgba(255,255,255,0.22)">TAM</text>
+            <text x="32" y="198" font-family="'Instrument Serif',serif" font-size="20" fill="rgba(255,255,255,0.75)">€2.4B</text>
+
+            <rect x="130" y="168" width="100" height="38" rx="6" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <text x="142" y="182" font-family="'Geist Mono',monospace" font-size="7" fill="rgba(255,255,255,0.22)">SAM</text>
+            <text x="142" y="198" font-family="'Instrument Serif',serif" font-size="20" fill="rgba(255,255,255,0.6)">€380M</text>
+
+            <rect x="240" y="168" width="120" height="38" rx="6" fill="rgba(37,99,235,0.07)" stroke="rgba(37,99,235,0.18)" stroke-width="1"/>
+            <text x="252" y="182" font-family="'Geist Mono',monospace" font-size="7" fill="rgba(37,99,235,0.7)">SOM</text>
+            <text x="252" y="198" font-family="'Instrument Serif',serif" font-size="20" fill="rgba(37,99,235,0.95)">€24M</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right: feature list -->
+      <div class="plan-feats">
+        <div class="pf reveal">
+          <div class="pf-n">01</div>
+          <div>
+            <div class="pf-t">Vision Synthesis</div>
+            <div class="pf-d">Converts a vague objective into a precise, investor-grade vision statement aligned with market realities.</div>
+          </div>
+        </div>
+        <div class="pf reveal">
+          <div class="pf-n">02</div>
+          <div>
+            <div class="pf-t">Sequential Roadmap</div>
+            <div class="pf-d">Phase-based timeline that defines exactly what must happen in each month — no ambiguity, no gaps.</div>
+          </div>
+        </div>
+        <div class="pf reveal">
+          <div class="pf-n">03</div>
+          <div>
+            <div class="pf-t">Budget Allocation</div>
+            <div class="pf-d">Optimal capital distribution across development, marketing, and operations — computed, not guessed.</div>
+          </div>
+        </div>
+        <div class="pf reveal">
+          <div class="pf-n">04</div>
+          <div>
+            <div class="pf-t">KPI Architecture</div>
+            <div class="pf-d">The single decisive metric for each milestone — the one number that determines success or pivot.</div>
+          </div>
+        </div>
+        <div class="pf reveal">
+          <div class="pf-n">05</div>
+          <div>
+            <div class="pf-t">Market Parameter Analysis</div>
+            <div class="pf-d">TAM/SAM/SOM estimation with competitive landscape and barrier-to-entry mapping.</div>
+          </div>
+        </div>
+        <div class="pf reveal">
+          <div class="pf-n">06</div>
+          <div>
+            <div class="pf-t">Risk Variable Matrix</div>
+            <div class="pf-d">Critical variables identified with immediate mitigation strategies for each scenario.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUILD -->
+<section class="section section--alt" id="build">
+  <div class="build-wrap">
+    <div class="build-intro">
+      <div>
+        <div class="s-label"><span class="s-num">02</span> BUILD</div>
+        <h2 class="s-title">The operative<br>engine.</h2>
+      </div>
+      <p class="s-body" style="margin:0">BUILD transforms strategy into a functioning machine — from legal entity to tech stack to tactical playbooks, fully operational.</p>
+    </div>
+
+    <!-- BUILD pipeline illustration — clean horizontal flow -->
+    <div class="reveal" style="margin-bottom:48px;">
+      <svg viewBox="0 0 1100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+        <defs>
+          <linearGradient id="pipe-g" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="rgba(37,99,235,0.7)"/>
+            <stop offset="75%" stop-color="rgba(37,99,235,0.35)"/>
+            <stop offset="100%" stop-color="rgba(37,99,235,0.1)"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Background rail -->
+        <line x1="0" y1="50" x2="1100" y2="50" stroke="rgba(255,255,255,0.04)"/>
+        <!-- Animated rail -->
+        <line x1="80" y1="50" x2="1020" y2="50" stroke="url(#pipe-g)" stroke-width="1" stroke-dasharray="6 4" class="dash-anim"/>
+
+        <!-- Stage 1 -->
+        <rect x="0" y="8" width="148" height="84" rx="8" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+        <text x="74" y="36" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.25)" letter-spacing="1.5">FINANCE</text>
+        <text x="74" y="58" text-anchor="middle" font-family="'Geist',sans-serif" font-size="15" font-weight="500" fill="rgba(255,255,255,0.75)">Pricing</text>
+        <text x="74" y="74" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.22)">LTV · CAC · MRR</text>
+        <circle cx="148" cy="50" r="4" fill="rgba(37,99,235,0.7)" class="blink-dot"/>
+
+        <!-- Stage 2 -->
+        <rect x="238" y="8" width="148" height="84" rx="8" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+        <text x="312" y="36" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.25)" letter-spacing="1.5">LEGAL</text>
+        <text x="312" y="58" text-anchor="middle" font-family="'Geist',sans-serif" font-size="15" font-weight="500" fill="rgba(255,255,255,0.75)">Entity</text>
+        <text x="312" y="74" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.22)">GmbH · AG · GDPR</text>
+        <circle cx="386" cy="50" r="4" fill="rgba(37,99,235,0.55)" class="blink-dot-2"/>
+
+        <!-- Stage 3 -->
+        <rect x="476" y="8" width="148" height="84" rx="8" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+        <text x="550" y="36" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.25)" letter-spacing="1.5">TECH STACK</text>
+        <text x="550" y="58" text-anchor="middle" font-family="'Geist',sans-serif" font-size="15" font-weight="500" fill="rgba(255,255,255,0.75)">Tools</text>
+        <text x="550" y="74" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.22)">CRM · ERP · DevOps</text>
+        <circle cx="624" cy="50" r="4" fill="rgba(37,99,235,0.45)" class="blink-dot-3"/>
+
+        <!-- Stage 4 -->
+        <rect x="714" y="8" width="148" height="84" rx="8" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+        <text x="788" y="36" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.25)" letter-spacing="1.5">TACTICS</text>
+        <text x="788" y="58" text-anchor="middle" font-family="'Geist',sans-serif" font-size="15" font-weight="500" fill="rgba(255,255,255,0.75)">Playbooks</text>
+        <text x="788" y="74" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.22)">Mkt · Sales · Ops</text>
+        <circle cx="862" cy="50" r="4" fill="rgba(37,99,235,0.6)" class="blink-dot"/>
+
+        <!-- Stage 5: final — slightly highlighted -->
+        <rect x="952" y="8" width="148" height="84" rx="8" fill="rgba(37,99,235,0.06)" stroke="rgba(37,99,235,0.2)" stroke-width="1"/>
+        <text x="1026" y="36" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(37,99,235,0.7)" letter-spacing="1.5">FLIGHT</text>
+        <text x="1026" y="58" text-anchor="middle" font-family="'Instrument Serif',serif" font-size="20" fill="rgba(255,255,255,0.85)">Live</text>
+        <text x="1026" y="74" text-anchor="middle" font-family="'Geist Mono',monospace" font-size="8" fill="rgba(255,255,255,0.25)">Venture operating</text>
+      </svg>
+    </div>
+
+    <div class="build-grid">
+      <div class="bc reveal">
+        <div class="bc-eye"><div class="bc-dot"></div>Finance</div>
+        <div class="bc-t">Pricing Architecture</div>
+        <div class="bc-d">Scalable tiers — Basic, Pro, Enterprise — with revenue stream mapping and unit economics.</div>
+        <div class="bc-tags"><span class="bc-tag">LTV/CAC</span><span class="bc-tag">Break-Even</span><span class="bc-tag">Payback</span></div>
+      </div>
+      <div class="bc reveal">
+        <div class="bc-eye"><div class="bc-dot"></div>Legal</div>
+        <div class="bc-t">Entity & Compliance</div>
+        <div class="bc-d">Optimal legal structure with full compliance checklist — GDPR, contracts, every critical step.</div>
+        <div class="bc-tags"><span class="bc-tag">GmbH · AG</span><span class="bc-tag">GDPR</span><span class="bc-tag">Contracts</span></div>
+      </div>
+      <div class="bc reveal">
+        <div class="bc-eye"><div class="bc-dot"></div>Technology</div>
+        <div class="bc-t">Tech Stack Selection</div>
+        <div class="bc-d">Most efficient tools for CRM, ERP, and automation — each justified for scalability and cost.</div>
+        <div class="bc-tags"><span class="bc-tag">CRM</span><span class="bc-tag">ERP</span><span class="bc-tag">Automation</span></div>
+      </div>
+      <div class="bc reveal">
+        <div class="bc-eye"><div class="bc-dot"></div>Operations</div>
+        <div class="bc-t">Tactic Repository</div>
+        <div class="bc-d">Bottlenecks identified. Tactical solutions delivered for marketing, sales, and operations — instantly.</div>
+        <div class="bc-tags"><span class="bc-tag">Marketing</span><span class="bc-tag">Sales</span><span class="bc-tag">Ops</span></div>
+      </div>
+      <div class="bc reveal">
+        <div class="bc-eye"><div class="bc-dot"></div>Platform</div>
+        <div class="bc-t">Venture Archive</div>
+        <div class="bc-d">All drafts preserved. Load, compare, and iterate between scenarios instantly — nothing lost.</div>
+        <div class="bc-tags"><span class="bc-tag">Cloud Sync</span><span class="bc-tag">Versioning</span></div>
+      </div>
+      <div class="bc reveal">
+        <div class="bc-eye"><div class="bc-dot"></div>AI</div>
+        <div class="bc-t">AI Feedback Loop</div>
+        <div class="bc-d">Generation grounded in live market data and validated frameworks. Checked against reality, not assumptions.</div>
+        <div class="bc-tags"><span class="bc-tag">Live Data</span><span class="bc-tag">Validation</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUDIENCE -->
+<section class="section" id="use-cases">
+  <div class="aud-wrap">
+    <div class="aud-intro">
+      <div>
+        <div class="s-label"><span class="s-num">03</span> Built for</div>
+        <h2 class="s-title">Who builds<br>on RUNWAY.</h2>
+      </div>
+      <p class="s-body" style="margin:0">Three types of operators. One infrastructure. Whether founding, validating, or investing — RUNWAY is the instrument.</p>
+    </div>
+    <div class="aud-grid">
+      <div class="aud-card reveal">
+        <div class="aud-icon">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect width="44" height="44" rx="10" fill="rgba(37,99,235,0.08)" stroke="rgba(37,99,235,0.16)" stroke-width="1"/>
+            <path d="M22 10L30 18H26V32H18V18H14L22 10Z" fill="rgba(37,99,235,0.8)"/>
+            <line x1="15" y1="36" x2="29" y2="36" stroke="rgba(37,99,235,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="aud-tag">Founders</div>
+        <div class="aud-name">Idea → MVP</div>
+        <div class="aud-desc">Stop spending months on theory. RUNWAY compresses the journey to a validated, operational venture — built to launch.</div>
+        <div class="aud-card-stripe"></div>
+      </div>
+      <div class="aud-card reveal">
+        <div class="aud-icon">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect width="44" height="44" rx="10" fill="rgba(37,99,235,0.08)" stroke="rgba(37,99,235,0.16)" stroke-width="1"/>
+            <rect x="11" y="20" width="7" height="14" rx="2" fill="rgba(37,99,235,0.3)"/>
+            <rect x="20" y="15" width="7" height="19" rx="2" fill="rgba(37,99,235,0.55)"/>
+            <rect x="29" y="11" width="7" height="23" rx="2" fill="rgba(37,99,235,0.8)"/>
+          </svg>
+        </div>
+        <div class="aud-tag">Strategists</div>
+        <div class="aud-name">Validate fast</div>
+        <div class="aud-desc">New business units validated in minutes, not weeks. Test hypotheses against market logic before committing capital.</div>
+        <div class="aud-card-stripe"></div>
+      </div>
+      <div class="aud-card reveal">
+        <div class="aud-icon">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect width="44" height="44" rx="10" fill="rgba(37,99,235,0.08)" stroke="rgba(37,99,235,0.16)" stroke-width="1"/>
+            <circle cx="22" cy="19" r="7" stroke="rgba(37,99,235,0.7)" stroke-width="1.5" fill="none"/>
+            <circle cx="22" cy="19" r="2.5" fill="rgba(37,99,235,0.6)"/>
+            <path d="M15 34C15 30.7 18.1 28 22 28C25.9 28 29 30.7 29 34" stroke="rgba(37,99,235,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="aud-tag">Investors</div>
+        <div class="aud-name">Audit in seconds</div>
+        <div class="aud-desc">Assess business plan plausibility in seconds. Data-driven and framework-validated — not gut feel.</div>
+        <div class="aud-card-stripe"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section section--alt" id="pricing">
+  <div class="pr-wrap">
+    <div class="pr-head reveal">
+      <div class="s-label" style="justify-content:center"><span class="s-num">04</span> Pricing</div>
+      <h2 class="s-title">No overhead.<br>Pure output.</h2>
+    </div>
+    <div class="pr-grid">
+      <div class="pr-card reveal">
+        <div class="pr-name">Basic</div>
+        <div class="pr-price"><sup>€</sup>49</div>
+        <div class="pr-per">per month</div>
+        <hr class="pr-div">
+        <div class="pr-feat"><span class="pr-check">✓</span> 3 active ventures</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> Full PLAN engine</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> Venture archive (30 days)</div>
+        <div class="pr-feat"><span class="pr-check pr-off">—</span><span class="pr-off">BUILD engine</span></div>
+        <div class="pr-feat"><span class="pr-check pr-off">—</span><span class="pr-off">API & export</span></div>
+        <button class="btn-pr">Get started</button>
+      </div>
+      <div class="pr-card feat reveal">
+        <div class="pr-badge">MOST POPULAR</div>
+        <div class="pr-name">Pro</div>
+        <div class="pr-price"><sup>€</sup>149</div>
+        <div class="pr-per">per month</div>
+        <hr class="pr-div">
+        <div class="pr-feat"><span class="pr-check">✓</span> Unlimited ventures</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> PLAN + BUILD engines</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> Unlimited archive</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> Real-time sync & export</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> AI feedback loop</div>
+        <button class="btn-pr pr-solid">Get started</button>
+      </div>
+      <div class="pr-card reveal">
+        <div class="pr-name">Enterprise</div>
+        <div class="pr-price" style="font-size:42px;letter-spacing:-1px">Custom</div>
+        <div class="pr-per">for teams, funds & accelerators</div>
+        <hr class="pr-div">
+        <div class="pr-feat"><span class="pr-check">✓</span> Everything in Pro</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> API access & white-label</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> Dedicated support</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> Custom integrations</div>
+        <div class="pr-feat"><span class="pr-check">✓</span> SLA guarantee</div>
+        <button class="btn-pr">Contact us</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-glow"></div>
+  <div class="s-label" style="justify-content:center;margin-bottom:28px"><span class="s-num">——</span>Ready</div>
+  <h2 class="cta-title">Clear for takeoff.</h2>
+  <p class="cta-body">Your venture deserves architecture, not assumptions. Build on RUNWAY — the platform that thinks in systems.</p>
+  <div class="cta-btns">
+    <button class="btn-primary" style="font-size:14px;padding:13px 28px">
+      Launch your venture
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M2.5 7H11.5M11.5 7L8 3.5M11.5 7L8 10.5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="btn-outline" style="font-size:14px;padding:13px 22px">Schedule a demo</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">RUN<span>WAY</span></div>
+  <div class="f-links">
+    <a href="#" class="f-link">Plan</a>
+    <a href="#" class="f-link">Build</a>
+    <a href="#" class="f-link">Pricing</a>
+    <a href="#" class="f-link">Docs</a>
+    <a href="#" class="f-link">Privacy</a>
+  </div>
+  <div class="f-copy">© 2025 RUNWAY v1.0</div>
+</footer>
+
+<script>
+// Cursor
+const cur = document.getElementById('c');
+const ring = document.getElementById('cr');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e=>{
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=mx+'px'; cur.style.top=my+'px';
+});
+(function loop(){
+  rx+=(mx-rx)*.1; ry+=(my-ry)*.1;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(loop);
+})();
+
+// Scroll reveal with stagger
+const els = [...document.querySelectorAll('.reveal')];
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    // stagger siblings
+    const siblings = [...e.target.parentElement.querySelectorAll('.reveal')].filter(x=>!x.classList.contains('in'));
+    const idx = siblings.indexOf(e.target);
+    setTimeout(()=>{ e.target.classList.add('in'); }, idx * 55);
+    io.unobserve(e.target);
+  });
+},{threshold:0.1});
+els.forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
