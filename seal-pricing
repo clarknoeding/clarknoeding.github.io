@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Seal - Pricing &amp; Tarife</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2A4DF4",
+                        "primary-hover": "#1e3bb3",
+                        "background-light": "#F8FAFC",
+                        "text-main": "#1E293B",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        'pill': '9999px',
+                        'card': '12px',
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        :root {
+            --primary-color: #2A4DF4;
+        }
+        .hero-bg {
+            background: linear-gradient(180deg, #3B82F6 0%, #60A5FA 40%, #BFDBFE 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .cloud {
+            position: absolute;
+            background: white;
+            filter: blur(45px);
+            opacity: 0.5;
+            border-radius: 50%;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .doc-mesh {
+            background-image: radial-gradient(#e2e8f0 0.5px, transparent 0.5px);
+            background-size: 32px 32px;
+        }
+        .pro-badge-gradient {
+            background: linear-gradient(135deg, #2A4DF4 0%, #6366f1 100%);
+        }
+        .custom-button {
+            border-radius: 8px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .custom-button:hover {
+            transform: translateY(-1px);
+        }
+        .abstract-ui-line {
+            background: linear-gradient(90deg, #e2e8f0 0%, transparent 100%);
+        }
+        .border-subtle {
+            border-color: rgba(226, 232, 240, 0.6);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-text-main bg-white">
+<nav class="absolute top-0 left-0 right-0 z-50">
+<div class="max-w-7xl mx-auto px-6 lg:px-8">
+<div class="flex justify-between items-center h-20">
+<div class="flex items-center gap-10">
+<div class="flex items-center gap-2">
+<div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-primary font-bold text-xl italic transform -skew-x-12 shadow-sm">
+                            S
+                        </div>
+<span class="font-bold text-xl tracking-tight text-white">Seal</span>
+</div>
+<div class="hidden md:flex space-x-8">
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium" href="#">Features</a>
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium" href="#">Integrations</a>
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium" href="#">Blog</a>
+<a class="text-white text-sm font-semibold border-b-2 border-white/50" href="#">Pricing</a>
+</div>
+</div>
+<div class="flex items-center space-x-6">
+<a class="text-white hover:text-white/80 text-sm font-medium hidden sm:block" href="#">Login</a>
+<a class="bg-white text-primary px-6 py-2.5 rounded-full text-sm font-bold transition-all hover:shadow-xl hover:-translate-y-0.5" href="#">
+                        Kostenlos starten
+                    </a>
+</div>
+</div>
+</div>
+</nav>
+<section class="hero-bg pt-44 pb-64">
+<div class="cloud w-64 h-32 top-20 -left-10"></div>
+<div class="cloud w-96 h-40 top-40 right-10"></div>
+<div class="cloud w-80 h-32 bottom-20 left-1/3"></div>
+<div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center text-white">
+<h1 class="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-[1.1]">
+                Wähle den passenden Plan
+            </h1>
+<p class="mt-6 max-w-2xl mx-auto text-lg text-white/90 mb-10">
+                Einfache Preise für wachsende Teams. Starte kostenlos und skaliere dein Business mit professionellen Tools für den Vertrieb.
+            </p>
+</div>
+</section>
+<section class="relative z-20 -mt-40 px-6">
+<div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+<div class="glass-card rounded-card p-10 flex flex-col">
+<div class="mb-8">
+<h3 class="text-xl font-bold text-slate-900 mb-2">Free</h3>
+<p class="text-slate-500 text-sm">Perfekt für den Einstieg und Freelancer.</p>
+</div>
+<div class="mb-8">
+<div class="flex items-baseline gap-1">
+<span class="text-5xl font-bold text-slate-900 tracking-tight">0€</span>
+<span class="text-slate-400 text-sm font-medium">/Monat</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 text-slate-600 text-sm">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+                        3 Angebote / Monat
+                    </li>
+<li class="flex items-center gap-3 text-slate-600 text-sm">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+                        Standard-Editor
+                    </li>
+<li class="flex items-center gap-3 text-slate-600 text-sm">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+                        E-Signatur Essentials
+                    </li>
+<li class="flex items-center gap-3 text-slate-300 text-sm">
+<span class="material-symbols-outlined text-slate-200 text-xl">block</span>
+                        Eigenes Branding
+                    </li>
+</ul>
+<a class="w-full py-4 text-center custom-button border border-slate-200 text-slate-700 font-bold bg-white/50 hover:bg-white" href="#">
+                    Kostenlos starten
+                </a>
+</div>
+<div class="glass-card rounded-card p-10 flex flex-col border-2 border-primary/20 relative">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 pro-badge-gradient text-white text-[11px] font-bold px-4 py-1.5 uppercase tracking-widest rounded-full shadow-lg">
+                    Empfohlen
+                </div>
+<div class="mb-8">
+<h3 class="text-xl font-bold text-slate-900 mb-2">Pro</h3>
+<p class="text-slate-500 text-sm">Alles was du für professionelles Wachstum brauchst.</p>
+</div>
+<div class="mb-8">
+<div class="flex items-baseline gap-1">
+<span class="text-5xl font-bold text-slate-900 tracking-tight">29€</span>
+<span class="text-slate-400 text-sm font-medium">/Monat</span>
+</div>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 text-slate-700 text-sm font-medium">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                        Unbegrenzte Angebote
+                    </li>
+<li class="flex items-center gap-3 text-slate-700 text-sm">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                        Eigenes Branding (White Label)
+                    </li>
+<li class="flex items-center gap-3 text-slate-700 text-sm">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                        Stripe Integration
+                    </li>
+<li class="flex items-center gap-3 text-slate-700 text-sm">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                        Erweiterte Statistiken
+                    </li>
+<li class="flex items-center gap-3 text-slate-700 text-sm">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                        Team-Zusammenarbeit
+                    </li>
+</ul>
+<a class="w-full py-4 text-center custom-button bg-primary text-white font-bold hover:bg-primary-hover shadow-lg shadow-blue-500/20" href="#">
+                    Jetzt Pro testen
+                </a>
+</div>
+</div>
+</section>
+<section class="py-32 bg-white">
+<div class="max-w-5xl mx-auto px-6">
+<div class="text-center mb-16">
+<h2 class="text-3xl font-bold text-slate-900 mb-4">Detaillierter Funktionsvergleich</h2>
+<p class="text-slate-500">Finde heraus, welcher Plan am besten zu deinen Anforderungen passt.</p>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-separate border-spacing-0">
+<thead>
+<tr class="text-left">
+<th class="py-6 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Funktion</th>
+<th class="py-6 px-4 text-center text-sm font-bold text-slate-900 border-b border-slate-100">Free</th>
+<th class="py-6 px-4 text-center text-sm font-bold text-slate-900 border-b border-slate-100">Pro</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="py-5 px-4 text-sm font-medium text-slate-700">Angebote pro Monat</td>
+<td class="py-5 px-4 text-center text-sm text-slate-500">3</td>
+<td class="py-5 px-4 text-center text-sm font-bold text-primary">Unbegrenzt</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="py-5 px-4 text-sm font-medium text-slate-700">Benutzerkonten</td>
+<td class="py-5 px-4 text-center text-sm text-slate-500">1</td>
+<td class="py-5 px-4 text-center text-sm text-slate-500">Bis zu 5</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="py-5 px-4 text-sm font-medium text-slate-700">Digital Signieren</td>
+<td class="py-5 px-4 text-center">
+<span class="material-symbols-outlined text-emerald-500 text-xl">check</span>
+</td>
+<td class="py-5 px-4 text-center">
+<span class="material-symbols-outlined text-emerald-500 text-xl font-bold">check</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="py-5 px-4 text-sm font-medium text-slate-700">Custom Branding</td>
+<td class="py-5 px-4 text-center text-slate-300">—</td>
+<td class="py-5 px-4 text-center">
+<span class="material-symbols-outlined text-emerald-500 text-xl font-bold">check</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 transition-colors">
+<td class="py-5 px-4 text-sm font-medium text-slate-700">E-Mail Support</td>
+<td class="py-5 px-4 text-center">
+<span class="material-symbols-outlined text-emerald-500 text-xl">check</span>
+</td>
+<td class="py-5 px-4 text-center">
+<span class="inline-flex items-center px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider border border-emerald-100">Priorisiert</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="py-32 bg-slate-50/50 border-y border-slate-100">
+<div class="max-w-7xl mx-auto px-6 lg:px-8">
+<div class="grid lg:grid-cols-2 gap-24 items-center">
+<div>
+<span class="text-primary font-bold text-xs tracking-[0.2em] uppercase mb-4 block">Intelligente Erstellung</span>
+<h2 class="text-4xl font-semibold text-slate-900 mb-6 leading-tight">Streamlined Proposal Creation</h2>
+<p class="text-lg text-slate-500 mb-12 leading-relaxed max-w-xl">
+                        Smarte Templates und nahtlose Datenflüsse. Reduzieren Sie den manuellen Aufwand und konzentrieren Sie sich auf den Abschluss.
+                    </p>
+<div class="grid grid-cols-2 gap-x-12 gap-y-10">
+<div class="space-y-3">
+<span class="material-symbols-outlined text-primary text-2xl">auto_awesome</span>
+<h4 class="font-bold text-slate-900 text-sm">Smart Automation</h4>
+<p class="text-xs text-slate-500 leading-normal">CRM-Integration für automatisierte Datenübernahme.</p>
+</div>
+<div class="space-y-3">
+<span class="material-symbols-outlined text-primary text-2xl">dashboard_customize</span>
+<h4 class="font-bold text-slate-900 text-sm">Modulare Blöcke</h4>
+<p class="text-xs text-slate-500 leading-normal">Inhaltsblöcke einfach per Klick zusammenfügen.</p>
+</div>
+</div>
+</div>
+<div class="relative">
+<div class="aspect-square bg-white rounded-3xl border border-slate-200 p-12 doc-mesh flex flex-col justify-center gap-8">
+<div class="space-y-4">
+<div class="h-2 w-1/3 bg-slate-200 rounded"></div>
+<div class="h-6 w-full abstract-ui-line rounded-sm"></div>
+</div>
+<div class="space-y-3 pl-8 border-l-2 border-primary/20">
+<div class="h-2 w-2/3 bg-slate-100 rounded"></div>
+<div class="h-2 w-full bg-slate-100 rounded"></div>
+<div class="h-2 w-4/5 bg-slate-100 rounded"></div>
+</div>
+<div class="relative h-32 bg-slate-50 rounded-xl border border-dashed border-slate-200 flex items-center justify-center">
+<div class="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Content Module</div>
+<div class="absolute -bottom-3 right-6 bg-white px-3 py-1.5 rounded-full border border-slate-100 shadow-sm flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+<span class="text-[9px] font-bold text-slate-500 uppercase">Automation Active</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32 bg-white">
+<div class="max-w-7xl mx-auto px-6 lg:px-8">
+<div class="grid lg:grid-cols-2 gap-24 items-center">
+<div class="order-2 lg:order-1 relative">
+<div class="aspect-square bg-white rounded-3xl border border-slate-100 shadow-sm p-16 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="space-y-2">
+<div class="h-1.5 w-12 bg-slate-100 rounded"></div>
+<div class="h-1.5 w-24 bg-slate-200 rounded"></div>
+</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full bg-slate-100 border-2 border-white"></div>
+<div class="w-8 h-8 rounded-full bg-slate-200 border-2 border-white"></div>
+</div>
+</div>
+<div class="relative py-12">
+<div class="h-px w-full bg-slate-100 mb-4"></div>
+<div class="h-px w-3/4 bg-slate-100 mb-4"></div>
+<div class="h-px w-1/2 bg-slate-100"></div>
+<div class="absolute top-10 left-1/2 flex flex-col items-center">
+<span class="material-symbols-outlined text-primary text-lg translate-y-1" style="font-variation-settings: 'FILL' 1">near_me</span>
+<span class="bg-primary text-[8px] text-white px-1.5 py-0.5 rounded font-bold">Edit</span>
+</div>
+</div>
+<div class="flex justify-between items-end">
+<div class="w-24 h-12 bg-slate-50 rounded-lg border border-slate-100 border-dashed"></div>
+<div class="bg-white px-4 py-2 rounded-lg border border-slate-100 flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-sm">lock</span>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">AES-256</span>
+</div>
+</div>
+</div>
+</div>
+<div class="order-1 lg:order-2">
+<span class="text-primary font-bold text-xs tracking-[0.2em] uppercase mb-4 block">Zusammenarbeit</span>
+<h2 class="text-4xl font-semibold text-slate-900 mb-6 leading-tight">Seamless Collaboration</h2>
+<p class="text-lg text-slate-500 mb-12 leading-relaxed max-w-xl">
+                        Echtzeit-Bearbeitung und rechtssichere E-Signaturen in einer zentralen Plattform. Ohne Medienbruch zum Erfolg.
+                    </p>
+<div class="grid grid-cols-2 gap-x-12 gap-y-10">
+<div class="space-y-3">
+<span class="material-symbols-outlined text-primary text-2xl">groups</span>
+<h4 class="font-bold text-slate-900 text-sm">Live Multi-User</h4>
+<p class="text-xs text-slate-500 leading-normal">Simultanes Arbeiten am selben Dokument.</p>
+</div>
+<div class="space-y-3">
+<span class="material-symbols-outlined text-primary text-2xl">verified_user</span>
+<h4 class="font-bold text-slate-900 text-sm">E-Signatur</h4>
+<p class="text-xs text-slate-500 leading-normal">DSGVO-konform und direkt im Browser.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32 px-6 lg:px-8 bg-slate-50">
+<div class="max-w-4xl mx-auto text-center">
+<h2 class="text-4xl font-bold text-slate-900 mb-6 tracking-tight">Ready to Get Started?</h2>
+<p class="text-lg text-slate-500 mb-12 max-w-xl mx-auto">
+                Schließen Sie sich über 5.000 Teams an und optimieren Sie Ihren Vertriebsprozess.
+            </p>
+<div class="flex flex-col sm:flex-row justify-center gap-4 items-center mb-16">
+<a class="custom-button bg-primary hover:bg-primary-hover text-white px-10 py-4 text-sm font-bold w-full sm:w-auto" href="#">
+                    Kostenlos starten
+                </a>
+<a class="custom-button bg-white text-slate-700 border border-slate-200 px-10 py-4 text-sm font-bold hover:bg-slate-50 w-full sm:w-auto" href="#">
+                    Demo ansehen
+                </a>
+</div>
+<div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+<div class="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+<span class="material-symbols-outlined text-emerald-500 text-sm">check</span>
+                    DSGVO Konform
+                </div>
+<div class="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+<span class="material-symbols-outlined text-emerald-500 text-sm">check</span>
+                    14 Tage Trial
+                </div>
+<div class="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+<span class="material-symbols-outlined text-emerald-500 text-sm">check</span>
+                    Support 24/7
+                </div>
+</div>
+</div>
+</section>
+<footer class="bg-white border-t border-slate-100 pt-20 pb-10">
+<div class="max-w-7xl mx-auto px-6 lg:px-8">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
+<div class="col-span-2">
+<div class="flex items-center gap-2 mb-6">
+<div class="w-9 h-9 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl italic transform -skew-x-12">S</div>
+<span class="font-bold text-xl tracking-tight text-slate-900">Seal</span>
+</div>
+<p class="text-slate-500 text-sm max-w-xs mb-8 leading-relaxed">Die moderne Art für Unternehmen, Angebote zu verwalten und schneller abzuschließen.</p>
+</div>
+<div>
+<h4 class="font-bold text-xs mb-6 uppercase tracking-widest text-slate-900">Produkt</h4>
+<ul class="space-y-4 text-sm text-slate-500 font-medium">
+<li><a class="hover:text-primary transition-colors" href="#">Features</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Preise</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Integrationen</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-xs mb-6 uppercase tracking-widest text-slate-900">Unternehmen</h4>
+<ul class="space-y-4 text-sm text-slate-500 font-medium">
+<li><a class="hover:text-primary transition-colors" href="#">Über uns</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Karriere</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-xs mb-6 uppercase tracking-widest text-slate-900">Rechtliches</h4>
+<ul class="space-y-4 text-sm text-slate-500 font-medium">
+<li><a class="hover:text-primary transition-colors" href="#">Datenschutz</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Impressum</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs text-slate-400 font-medium">© 2024 Seal GmbH. Alle Rechte vorbehalten.</p>
+<div class="flex gap-8">
+<a class="text-xs text-slate-400 hover:text-primary font-bold transition-colors" href="#">Twitter</a>
+<a class="text-xs text-slate-400 hover:text-primary font-bold transition-colors" href="#">LinkedIn</a>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>
