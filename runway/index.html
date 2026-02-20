@@ -67,7 +67,7 @@ nav {
 .n-right { display:flex; align-items:center; gap:8px }
 .n-login { font-family:'Geist',sans-serif; font-size:13px; color:var(--t3); background:none; border:none; cursor:pointer; padding:5px 12px; border-radius:6px; transition:color .13s }
 .n-login:hover { color:var(--t1) }
-.n-cta {
+.n-cta { text-decoration:none;
   font-family:'Geist',sans-serif; font-size:13px; font-weight:500; color:#fff;
   background:var(--blue); border:1px solid rgba(255,255,255,0.1);
   cursor:pointer; padding:7px 16px; border-radius:7px;
@@ -149,7 +149,7 @@ nav {
 
 /* Buttons */
 .hero-btns { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:20px; animation:up .5s cubic-bezier(.16,1,.3,1) .22s both }
-.btn-p {
+.btn-p { text-decoration:none;
   font-family:'Geist',sans-serif; font-size:14px; font-weight:500; color:#fff;
   background:var(--blue); border:1px solid rgba(255,255,255,0.1);
   cursor:pointer; padding:11px 22px; border-radius:8px;
@@ -157,7 +157,7 @@ nav {
   transition:background .13s, box-shadow .22s, transform .13s;
 }
 .btn-p:hover { background:var(--blue2); box-shadow:0 14px 40px var(--g); transform:translateY(-1px) }
-.btn-s {
+.btn-s { text-decoration:none;
   font-family:'Geist',sans-serif; font-size:14px; font-weight:400; color:var(--t2);
   background:transparent; border:1px solid var(--w10); cursor:pointer; padding:11px 20px; border-radius:8px;
   letter-spacing:-.1px; transition:color .13s, border-color .13s, background .13s;
@@ -436,7 +436,7 @@ nav {
 .pfeat { display:flex; gap:9px; font-size:13px; color:var(--t2); margin-bottom:9px; line-height:1.5; letter-spacing:-.05px }
 .chk { color:var(--em); flex-shrink:0 }
 .no  { color:var(--t4); flex-shrink:0 } .no+span { color:var(--t4) }
-.pbtn {
+.pbtn { text-decoration:none; display:block;
   font-family:'Geist',sans-serif; display:block; width:100%; margin-top:24px;
   font-size:13px; font-weight:500; cursor:pointer; padding:10px; border-radius:8px;
   text-align:center; transition:all .13s; letter-spacing:-.1px;
@@ -471,7 +471,7 @@ nav {
 .cta-h em { font-style:italic; color:var(--t2) }
 .cta-p { font-size:15.5px; font-weight:300; color:var(--t2); max-width:360px; margin:0 auto 36px; line-height:1.72; position:relative; z-index:1; letter-spacing:-.1px }
 .cta-btns { display:flex; align-items:center; justify-content:center; gap:10px; position:relative; z-index:1 }
-.cta-bp {
+.cta-bp { text-decoration:none;
   font-family:'Geist',sans-serif; font-size:14px; font-weight:500; color:#fff;
   background:var(--blue); border:1px solid rgba(255,255,255,0.1);
   cursor:pointer; padding:11px 22px; border-radius:8px;
@@ -479,7 +479,7 @@ nav {
   transition:background .13s, box-shadow .22s, transform .13s;
 }
 .cta-bp:hover { background:var(--blue2); box-shadow:0 14px 40px var(--g); transform:translateY(-1px) }
-.cta-bs {
+.cta-bs { text-decoration:none;
   font-family:'Geist',sans-serif; font-size:14px; font-weight:400; color:var(--t2);
   background:rgba(255,255,255,0.04); border:1px solid var(--w10); cursor:pointer;
   padding:11px 20px; border-radius:8px; letter-spacing:-.1px;
@@ -542,10 +542,10 @@ footer { border-top:1px solid var(--w7); padding:28px }
     </div>
     <div class="n-right">
       <button class="n-login">Log in</button>
-      <button class="n-cta">
+      <a href="https://gemini.google.com/share/a70e534bc9ad" target="_blank" class="n-cta">
         Get started
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6H10M10 6L7 3M10 6L7 9" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
+      </a>
     </div>
   </div>
 </nav>
@@ -572,11 +572,11 @@ footer { border-top:1px solid var(--w7); padding:28px }
     </p>
 
     <div class="hero-btns">
-      <button class="btn-p">
+      <a href="https://gemini.google.com/share/a70e534bc9ad" target="_blank" class="btn-p">
         Start building free
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5H11M11 6.5L7.5 3M11 6.5L7.5 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="btn-s">Watch demo</button>
+      </a>
+      <a href="https://gemini.google.com/share/a70e534bc9ad" target="_blank" class="btn-s">Watch demo</a>
     </div>
 
     <div class="hero-proof">
@@ -856,7 +856,7 @@ footer { border-top:1px solid var(--w7); padding:28px }
         <div class="pfeat"><span class="chk">✓</span> 30-day archive</div>
         <div class="pfeat"><span class="no">—</span><span> BUILD engine</span></div>
         <div class="pfeat"><span class="no">—</span><span> API & export</span></div>
-        <button class="pbtn">Get started</button>
+        <a href="https://gemini.google.com/share/a70e534bc9ad" target="_blank" class="pbtn">Get started</a>
       </div>
       <div class="pcard feat">
         <div class="ppill">Most popular</div>
@@ -869,7 +869,7 @@ footer { border-top:1px solid var(--w7); padding:28px }
         <div class="pfeat"><span class="chk">✓</span> Unlimited archive</div>
         <div class="pfeat"><span class="chk">✓</span> Real-time sync & export</div>
         <div class="pfeat"><span class="chk">✓</span> AI feedback loop</div>
-        <button class="pbtn solid">Get started</button>
+        <a href="https://gemini.google.com/share/a70e534bc9ad" target="_blank" class="pbtn solid">Get started</a>
       </div>
       <div class="pcard">
         <div class="ptier">Enterprise</div>
@@ -881,7 +881,7 @@ footer { border-top:1px solid var(--w7); padding:28px }
         <div class="pfeat"><span class="chk">✓</span> Dedicated support & SLA</div>
         <div class="pfeat"><span class="chk">✓</span> Custom integrations</div>
         <div class="pfeat"><span class="chk">✓</span> SSO & audit logs</div>
-        <button class="pbtn">Contact sales</button>
+        <a href="https://gemini.google.com/share/a70e534bc9ad" target="_blank" class="pbtn">Contact sales</a>
       </div>
     </div>
   </div>
@@ -894,11 +894,11 @@ footer { border-top:1px solid var(--w7); padding:28px }
     <h2 class="cta-h">Your venture deserves<br>a <em>real architecture.</em></h2>
     <p class="cta-p">No guesswork. No templates. Build on validated frameworks and live market data — from day one.</p>
     <div class="cta-btns">
-      <button class="cta-bp">
+      <a href="https://gemini.google.com/share/a70e534bc9ad" target="_blank" class="cta-bp">
         Start for free
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5H11M11 6.5L7.5 3M11 6.5L7.5 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="cta-bs">Schedule a demo</button>
+      </a>
+      <a href="https://gemini.google.com/share/a70e534bc9ad" target="_blank" class="cta-bs">Schedule a demo</a>
     </div>
   </div>
 </div>
