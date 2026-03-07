@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>nexite — Preisrechner</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --border: #222222;
+    --border2: #2a2a2a;
+    --text: #f0f0f0;
+    --text-muted: #666;
+    --text-dim: #444;
+    --accent: #c8ff00;
+    --accent2: #ff6b35;
+    --accent3: #4fc3f7;
+    --red: #ff4444;
+    --green: #44ff88;
+    --gold: #ffd700;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+
+  .header-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+  }
+
+  .page-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 36px;
+  }
+
+  /* ── METHODS GRID ── */
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .methods-grid { grid-template-columns: 1fr; }
+  }
+
+  .method-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .method-card:hover { border-color: var(--border2); }
+
+  .method-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .method-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .tag-a { background: rgba(200,255,0,0.12); color: var(--accent); border: 1px solid rgba(200,255,0,0.25); }
+  .tag-b { background: rgba(255,107,53,0.12); color: var(--accent2); border: 1px solid rgba(255,107,53,0.25); }
+  .tag-c { background: rgba(79,195,247,0.12); color: var(--accent3); border: 1px solid rgba(79,195,247,0.25); }
+
+  .method-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── FORM FIELDS ── */
+  .field { margin-bottom: 14px; }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  input[type="number"], input[type="text"], select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input:focus, select:focus { border-color: #333; }
+
+  .input-prefix {
+    position: relative;
+  }
+  .input-prefix span {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    pointer-events: none;
+  }
+  .input-prefix input { padding-left: 24px; }
+
+  /* ── RESULT BLOCK ── */
+  .result-block {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+
+  .result-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .result-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .result-a { color: var(--accent); }
+  .result-b { color: var(--accent2); }
+  .result-c { color: var(--accent3); }
+
+  .result-breakdown {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .result-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .result-line.highlight {
+    color: var(--text-muted);
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 2px;
+  }
+
+  /* ── BOTTOM ROW ── */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 700px) {
+    .bottom-row { grid-template-columns: 1fr; }
+  }
+
+  /* ── MODIFIER PANEL ── */
+  .modifier-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-title .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  .mod-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .mod-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 9px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .mod-btn:hover { border-color: #444; color: var(--text); background: #1e1e1e; }
+  .mod-btn.active { background: rgba(200,255,0,0.08); border-color: rgba(200,255,0,0.3); color: var(--accent); }
+
+  .custom-mod {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .custom-mod input { flex: 1; }
+  .apply-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 9px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+  .apply-btn:hover { opacity: 0.85; }
+
+  .mod-display {
+    margin-top: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* ── SUMMARY PANEL ── */
+  .summary-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .summary-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+  .sum-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+
+  .sum-row-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .sum-row-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .recommended-zone {
+    background: rgba(200,255,0,0.06);
+    border: 1px solid rgba(200,255,0,0.2);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 12px;
+  }
+
+  .rec-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .rec-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -1.5px;
+    line-height: 1;
+  }
+
+  .rec-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(200,255,0,0.5);
+    margin-top: 4px;
+  }
+
+  /* ── ROUNDING CONTROL ── */
+  .rounding-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .round-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .round-btn:hover { border-color: #444; color: var(--text); }
+  .round-btn.active { border-color: rgba(200,255,0,0.35); color: var(--accent); background: rgba(200,255,0,0.07); }
+
+  /* ── ROI INSIGHT ── */
+  .roi-insight {
+    background: rgba(79,195,247,0.06);
+    border: 1px solid rgba(79,195,247,0.2);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 14px;
+  }
+
+  .roi-insight-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent3);
+    margin-bottom: 6px;
+  }
+
+  .roi-insight-text {
+    font-size: 13px;
+    color: rgba(240,240,240,0.75);
+    line-height: 1.6;
+  }
+
+  .roi-insight-text strong {
+    color: var(--accent3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── SEPARATOR ── */
+  .sep {
+    height: 1px;
+    background: var(--border);
+    margin: 10px 0;
+  }
+
+  /* ── TOOLTIP STYLE NOTE ── */
+  .field-hint {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  /* ── EXPORT BAR ── */
+  .export-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-top: 16px;
+  }
+
+  .export-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .export-actions { display: flex; gap: 8px; }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-outline:hover { border-color: #555; color: var(--text); }
+
+  .btn-primary {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 16px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  /* ── CLV INSIGHT ── */
+  .clv-story {
+    background: rgba(255,215,0,0.05);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-top: 12px;
+  }
+
+  .clv-story-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .clv-story-text {
+    font-size: 12px;
+    color: rgba(240,240,240,0.65);
+    line-height: 1.6;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .clv-story-text em {
+    color: var(--gold);
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">nexite<span>.</span></div>
+  <div class="header-badge">Interner Preisrechner — v1.0</div>
+</header>
+
+<div class="container">
+  <div class="page-title">Preisrechner</div>
+  <div class="page-sub">// drei Methoden · Wertanheber · Rundung · Angebotslogik</div>
+
+  <!-- METHODS ROW -->
+  <div class="methods-grid">
+
+    <!-- METHOD A: FLOOR -->
+    <div class="method-card">
+      <div class="method-label">
+        <span class="method-tag tag-a">A</span>
+        <span class="method-name">Floor / Kostenbasis</span>
+      </div>
+
+      <div class="field">
+        <label>Stunden / Sprint</label>
+        <input type="number" id="a_hours" value="80" min="1" oninput="calc()">
+      </div>
+
+      <div class="field">
+        <label>Interner Stundensatz (€)</label>
+        <div class="input-prefix"><span>€</span><input type="number" id="a_rate" value="110" min="1" oninput="calc()"></div>
+        <div class="field-hint">Empfehlung: 80–150 €/h für B2B SaaS</div>
+      </div>
+
+      <div class="field">
+        <label>Fremdkosten (€)</label>
+        <div class="input-prefix"><span>€</span><input type="number" id="a_external" value="500" min="0" oninput="calc()"></div>
+        <div class="field-hint">Tools, Stock, Sub-Contractor, Lizenzen</div>
+      </div>
+
+      <div class="field">
+        <label>Puffer (%)</label>
+        <input type="number" id="a_buffer" value="20" min="0" max="100" oninput="calc()">
+        <div class="field-hint">Standard: 20% für Scope Creep</div>
+      </div>
+
+      <div class="result-block">
+        <div class="result-label">Floor-Preis</div>
+        <div class="result-value result-a" id="result_a">—</div>
+        <div class="result-breakdown" id="breakdown_a"></div>
+      </div>
+    </div>
+
+    <!-- METHOD B: MARKET ANCHOR -->
+    <div class="method-card">
+      <div class="method-label">
+        <span class="method-tag tag-b">B</span>
+        <span class="method-name">Market Anchor / Alternativkosten</span>
+      </div>
+
+      <div class="field">
+        <label>Marktpreis Branding (€)</label>
+        <div class="input-prefix"><span>€</span><input type="number" id="b_branding" value="5000" min="0" oninput="calc()"></div>
+      </div>
+
+      <div class="field">
+        <label>Marktpreis Strategie (€)</label>
+        <div class="input-prefix"><span>€</span><input type="number" id="b_strategy" value="10000" min="0" oninput="calc()"></div>
+      </div>
+
+      <div class="field">
+        <label>Marktpreis Development (€)</label>
+        <div class="input-prefix"><span>€</span><input type="number" id="b_dev" value="3000" min="0" oninput="calc()"></div>
+      </div>
+
+      <div class="field">
+        <label>Weitere Leistung (€)</label>
+        <div class="input-prefix"><span>€</span><input type="number" id="b_other" value="0" min="0" oninput="calc()"></div>
+      </div>
+
+      <div class="field">
+        <label>Eigener Discount (%)</label>
+        <input type="number" id="b_discount" value="15" min="0" max="80" oninput="calc()">
+        <div class="field-hint">Bundle-Vorteil gegenüber Einzelbuchung</div>
+      </div>
+
+      <div class="result-block">
+        <div class="result-label">Marktpreis gesamt → Angebotspreis</div>
+        <div class="result-value result-b" id="result_b">—</div>
+        <div class="result-breakdown" id="breakdown_b"></div>
+      </div>
+    </div>
+
+    <!-- METHOD C: VALUE-BASED -->
+    <div class="method-card">
+      <div class="method-label">
+        <span class="method-tag tag-c">C</span>
+        <span class="method-name">Value Link / ROI-based</span>
+      </div>
+
+      <div class="field">
+        <label>Erwarteter Mehrumsatz / Jahr (€)</label>
+        <div class="input-prefix"><span>€</span><input type="number" id="c_revenue" value="120000" min="0" oninput="calc()"></div>
+        <div class="field-hint">z.B. 2 neue Kunden/Monat × 12 × CLV</div>
+      </div>
+
+      <div class="field">
+        <label>Fairness-Quote (%)</label>
+        <input type="number" id="c_fairness" value="10" min="1" max="50" oninput="calc()">
+        <div class="field-hint">Standard: 10% des Mehrwerts</div>
+      </div>
+
+      <div class="field">
+        <label>CLV pro Kunde (€)</label>
+        <div class="input-prefix"><span>€</span><input type="number" id="c_clv" value="5000" min="0" oninput="calc()"></div>
+      </div>
+
+      <div class="field">
+        <label>Neue Kunden/Monat (Projektion)</label>
+        <input type="number" id="c_clients" value="2" min="0" oninput="calc()">
+      </div>
+
+      <div class="result-block">
+        <div class="result-label">Value-based Preis</div>
+        <div class="result-value result-c" id="result_c">—</div>
+        <div class="result-breakdown" id="breakdown_c"></div>
+      </div>
+
+      <div class="clv-story" id="clv_story"></div>
+    </div>
+
+  </div><!-- /methods-grid -->
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row">
+
+    <!-- MODIFIER PANEL -->
+    <div class="modifier-panel">
+      <div class="panel-title"><span class="dot"></span>Wertanheber / Preiskorrektur</div>
+
+      <div class="mod-grid">
+        <button class="mod-btn" onclick="setMod(-20)">−20%</button>
+        <button class="mod-btn" onclick="setMod(-10)">−10%</button>
+        <button class="mod-btn" onclick="setMod(0)">Reset</button>
+        <button class="mod-btn" onclick="setMod(10)">+10%</button>
+        <button class="mod-btn" onclick="setMod(15)">+15% Dringlichkeit</button>
+        <button class="mod-btn" onclick="setMod(25)">+25% Premium</button>
+        <button class="mod-btn" onclick="setMod(35)">+35% Exklusiv</button>
+        <button class="mod-btn" onclick="setMod(50)">+50% High-End</button>
+      </div>
+
+      <div class="custom-mod">
+        <input type="number" id="custom_mod_val" placeholder="Eigener % Wert" step="1">
+        <button class="apply-btn" onclick="applyCustomMod()">Anwenden</button>
+      </div>
+
+      <div class="mod-display" id="mod_display">Kein Modifier aktiv</div>
+
+      <div class="sep"></div>
+
+      <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Preisrundung</div>
+      <div class="rounding-row">
+        <button class="round-btn" onclick="setRound(1)">Exakt</button>
+        <button class="round-btn active" onclick="setRound(100)">100 €</button>
+        <button class="round-btn" onclick="setRound(250)">250 €</button>
+        <button class="round-btn" onclick="setRound(500)">500 €</button>
+        <button class="round-btn" onclick="setRound(1000)">1.000 €</button>
+      </div>
+    </div>
+
+    <!-- SUMMARY PANEL -->
+    <div class="summary-panel">
+      <div class="panel-title"><span class="dot" style="background:var(--accent)"></span>Angebotsempfehlung</div>
+
+      <div class="summary-rows">
+        <div class="sum-row">
+          <div class="sum-row-label">A — Floor (Minimum)</div>
+          <div class="sum-row-value result-a" id="sum_a">—</div>
+        </div>
+        <div class="sum-row">
+          <div class="sum-row-label">B — Market Anchor</div>
+          <div class="sum-row-value result-b" id="sum_b">—</div>
+        </div>
+        <div class="sum-row">
+          <div class="sum-row-label">C — Value Link</div>
+          <div class="sum-row-value result-c" id="sum_c">—</div>
+        </div>
+      </div>
+
+      <div class="recommended-zone">
+        <div class="rec-label">Empfohlener Angebotspreis</div>
+        <div class="rec-value" id="rec_price">—</div>
+        <div class="rec-sub" id="rec_sub">Median A/B/C nach Modifier &amp; Rundung</div>
+      </div>
+
+      <div class="roi-insight" id="roi_insight_box"></div>
+    </div>
+
+  </div><!-- /bottom-row -->
+
+  <!-- EXPORT BAR -->
+  <div class="export-bar">
+    <div class="export-label">Berechnungsstand exportieren oder zurücksetzen</div>
+    <div class="export-actions">
+      <button class="btn-outline" onclick="resetAll()">Zurücksetzen</button>
+      <button class="btn-outline" onclick="copyValues()">Werte kopieren</button>
+      <button class="btn-primary" onclick="exportCSV()">CSV Export</button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  let modifier = 0;
+  let roundTo = 100;
+
+  function fmt(n) {
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+  }
+
+  function applyMod(val) {
+    return val * (1 + modifier / 100);
+  }
+
+  function roundVal(val) {
+    if (roundTo <= 1) return val;
+    return Math.ceil(val / roundTo) * roundTo;
+  }
+
+  function finalPrice(raw) {
+    return roundVal(applyMod(raw));
+  }
+
+  function setMod(pct) {
+    modifier = pct;
+    document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+    const btns = document.querySelectorAll('.mod-btn');
+    btns.forEach(b => {
+      if (b.textContent.trim().startsWith((pct > 0 ? '+' : '') + pct + '%') || (pct === 0 && b.textContent === 'Reset')) {
+        b.classList.add('active');
+      }
+    });
+    updateModDisplay();
+    calc();
+  }
+
+  function applyCustomMod() {
+    const v = parseFloat(document.getElementById('custom_mod_val').value);
+    if (!isNaN(v)) {
+      modifier = v;
+      document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+      updateModDisplay();
+      calc();
+    }
+  }
+
+  function updateModDisplay() {
+    const el = document.getElementById('mod_display');
+    if (modifier === 0) {
+      el.textContent = 'Kein Modifier aktiv';
+      el.style.color = 'var(--text-dim)';
+    } else {
+      const sign = modifier > 0 ? '+' : '';
+      el.textContent = `Modifier aktiv: ${sign}${modifier}%`;
+      el.style.color = modifier > 0 ? 'var(--accent)' : 'var(--red)';
+    }
+  }
+
+  function setRound(r) {
+    roundTo = r;
+    document.querySelectorAll('.round-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    calc();
+  }
+
+  function g(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+  function calc() {
+    // METHOD A
+    const hours = g('a_hours');
+    const rate = g('a_rate');
+    const ext = g('a_external');
+    const buf = g('a_buffer');
+    const rawA = (hours * rate + ext) * (1 + buf / 100);
+    const priceA = finalPrice(rawA);
+
+    document.getElementById('result_a').textContent = fmt(priceA);
+    document.getElementById('breakdown_a').innerHTML = `
+      <div class="result-line"><span>Stunden × Satz</span><span>${fmt(hours * rate)}</span></div>
+      <div class="result-line"><span>+ Fremdkosten</span><span>${fmt(ext)}</span></div>
+      <div class="result-line"><span>+ Puffer (${buf}%)</span><span>${fmt((hours * rate + ext) * buf / 100)}</span></div>
+      ${modifier !== 0 ? `<div class="result-line"><span>+ Modifier (${modifier > 0 ? '+' : ''}${modifier}%)</span><span>${fmt(priceA - rawA)}</span></div>` : ''}
+      <div class="result-line highlight"><span>Floor</span><span>${fmt(priceA)}</span></div>
+    `;
+
+    // METHOD B
+    const br = g('b_branding'), st = g('b_strategy'), dev = g('b_dev'), oth = g('b_other');
+    const totalMarket = br + st + dev + oth;
+    const disc = g('b_discount');
+    const rawB = totalMarket * (1 - disc / 100);
+    const priceB = finalPrice(rawB);
+
+    document.getElementById('result_b').textContent = fmt(priceB);
+    document.getElementById('breakdown_b').innerHTML = `
+      <div class="result-line"><span>Branding</span><span>${fmt(br)}</span></div>
+      <div class="result-line"><span>Strategie</span><span>${fmt(st)}</span></div>
+      <div class="result-line"><span>Development</span><span>${fmt(dev)}</span></div>
+      ${oth > 0 ? `<div class="result-line"><span>Weitere</span><span>${fmt(oth)}</span></div>` : ''}
+      <div class="result-line"><span>Marktpreis total</span><span>${fmt(totalMarket)}</span></div>
+      <div class="result-line"><span>Bundle-Rabatt (−${disc}%)</span><span>−${fmt(totalMarket * disc / 100)}</span></div>
+      ${modifier !== 0 ? `<div class="result-line"><span>Modifier (${modifier > 0 ? '+' : ''}${modifier}%)</span><span>${fmt(priceB - rawB)}</span></div>` : ''}
+      <div class="result-line highlight"><span>Angebotspreis</span><span>${fmt(priceB)}</span></div>
+    `;
+
+    // METHOD C
+    const revenue = g('c_revenue');
+    const fairness = g('c_fairness');
+    const clv = g('c_clv');
+    const clients = g('c_clients');
+    const annualProj = clients * 12 * clv;
+    const rawC = (annualProj || revenue) * (fairness / 100);
+    const priceC = finalPrice(rawC);
+    const baseRevenue = annualProj > 0 ? annualProj : revenue;
+
+    document.getElementById('result_c').textContent = fmt(priceC);
+    document.getElementById('breakdown_c').innerHTML = `
+      <div class="result-line"><span>${clients} Kunden/Mo × 12 × ${fmt(clv)} CLV</span><span>${fmt(annualProj)}</span></div>
+      <div class="result-line"><span>Fairness-Quote (${fairness}%)</span><span>${fmt(rawC)}</span></div>
+      ${modifier !== 0 ? `<div class="result-line"><span>Modifier (${modifier > 0 ? '+' : ''}${modifier}%)</span><span>${fmt(priceC - rawC)}</span></div>` : ''}
+      <div class="result-line highlight"><span>Value-Preis</span><span>${fmt(priceC)}</span></div>
+    `;
+
+    // CLV Story
+    document.getElementById('clv_story').innerHTML = `
+      <div class="clv-story-label">Sell your Price — Story</div>
+      <div class="clv-story-text">
+        Wenn unser System nur <em>${clients} zusätzliche Kunden/Monat</em> bringt, sprechen wir über 
+        <em>${fmt(annualProj)} Mehrumsatz im Jahr</em>. 
+        Gegenüber diesem Hebel ist ein Investment von <em>${fmt(priceC)}</em> keine Ausgabe — 
+        es ist eine <em>Asset-Aktivierung.</em>
+      </div>
+    `;
+
+    // SUMMARY
+    document.getElementById('sum_a').textContent = fmt(priceA);
+    document.getElementById('sum_b').textContent = fmt(priceB);
+    document.getElementById('sum_c').textContent = fmt(priceC);
+
+    // Recommended: smart median — always above floor, leaning toward B if realistic
+    const values = [priceA, priceB, priceC].sort((a, b) => a - b);
+    const median = values[1]; // middle value
+    const rec = median >= priceA ? median : priceA;
+
+    document.getElementById('rec_price').textContent = fmt(rec);
+    const margin = priceA > 0 ? ((rec - rawA) / rawA * 100).toFixed(0) : 0;
+    document.getElementById('rec_sub').textContent = `Marge ~${margin}% über Kostenbasis · Median A/B/C`;
+
+    // ROI Insight
+    const roi = baseRevenue > 0 ? (baseRevenue / rec).toFixed(1) : '—';
+    document.getElementById('roi_insight_box').innerHTML = `
+      <div class="roi-insight-label">ROI-Argument für den Kunden</div>
+      <div class="roi-insight-text">
+        Bei einem Angebotspreis von <strong>${fmt(rec)}</strong> und projiziertem Mehrumsatz von 
+        <strong>${fmt(baseRevenue)}/Jahr</strong> beträgt der ROI-Faktor 
+        <strong>×${roi}</strong> — d.h. jeder investierte Euro bringt ${roi}€ zurück.
+      </div>
+    `;
+  }
+
+  function resetAll() {
+    const defaults = {
+      a_hours: 80, a_rate: 110, a_external: 500, a_buffer: 20,
+      b_branding: 5000, b_strategy: 10000, b_dev: 3000, b_other: 0, b_discount: 15,
+      c_revenue: 120000, c_fairness: 10, c_clv: 5000, c_clients: 2
+    };
+    Object.entries(defaults).forEach(([id, val]) => {
+      document.getElementById(id).value = val;
+    });
+    modifier = 0;
+    roundTo = 100;
+    document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.round-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.round-btn')[1].classList.add('active');
+    document.getElementById('custom_mod_val').value = '';
+    updateModDisplay();
+    calc();
+  }
+
+  function copyValues() {
+    const a = document.getElementById('sum_a').textContent;
+    const b = document.getElementById('sum_b').textContent;
+    const c = document.getElementById('sum_c').textContent;
+    const rec = document.getElementById('rec_price').textContent;
+    const text = `nexite Preisrechner\nA (Floor): ${a}\nB (Market): ${b}\nC (Value): ${c}\nEmpfehlung: ${rec}`;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = event.target;
+      btn.textContent = '✓ Kopiert';
+      setTimeout(() => btn.textContent = 'Werte kopieren', 1500);
+    });
+  }
+
+  function exportCSV() {
+    const a = document.getElementById('sum_a').textContent;
+    const b = document.getElementById('sum_b').textContent;
+    const c = document.getElementById('sum_c').textContent;
+    const rec = document.getElementById('rec_price').textContent;
+    const mod = modifier;
+    const round = roundTo;
+    const now = new Date().toLocaleDateString('de-DE');
+
+    const rows = [
+      ['Datum', 'Methode', 'Preis', 'Modifier %', 'Rundung'],
+      [now, 'A — Floor', a, mod, round],
+      [now, 'B — Market Anchor', b, mod, round],
+      [now, 'C — Value Link', c, mod, round],
+      [now, 'EMPFEHLUNG', rec, mod, round],
+    ];
+    const csv = rows.map(r => r.join(';')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a2 = document.createElement('a');
+    a2.href = url;
+    a2.download = `nexite-preisrechner-${now.replace(/\./g,'-')}.csv`;
+    a2.click();
+  }
+
+  // init
+  calc();
+</script>
+</body>
+</html>
