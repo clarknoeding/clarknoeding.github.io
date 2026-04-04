@@ -22,6 +22,7 @@
   --accent-2: #a78bfa;
   --accent-glow: rgba(123,110,246,0.15);
   --green: #22c55e;
+  --amber: #f59e0b;
 }
 
 html { scroll-behavior: smooth; }
@@ -35,8 +36,6 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
-
-
 
 body::after {
   content: '';
@@ -342,6 +341,17 @@ nav {
   animation: blink 2s ease-in-out infinite;
 }
 
+/* New tag for "Just Launched" */
+.hl-tag.new {
+  background: rgba(245,158,11,0.1);
+  border-color: rgba(245,158,11,0.3);
+  color: var(--amber);
+}
+.hl-tag.new .hl-tag-dot {
+  background: var(--amber);
+  box-shadow: 0 0 6px rgba(245,158,11,0.6);
+}
+
 .hl-title {
   font-size: 36px;
   font-weight: 400;
@@ -364,6 +374,30 @@ nav {
   color: var(--muted);
 }
 .hl-date span { color: var(--accent-2); }
+.hl-date span.amber { color: var(--amber); }
+
+.hl-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.25);
+  color: var(--amber);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  box-shadow: 0 0 20px rgba(245,158,11,0.1);
+}
+.hl-link:hover {
+  background: rgba(245,158,11,0.18);
+  border-color: rgba(245,158,11,0.45);
+  transform: translateY(-1px);
+}
 
 .hl-visual {
   position: relative;
@@ -371,6 +405,94 @@ nav {
   align-items: center;
   justify-content: center;
   height: 200px;
+}
+
+/* Brief visual — paper/letter aesthetic */
+.brief-visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+.brief-paper {
+  position: relative;
+  z-index: 2;
+  width: 100px;
+  height: 130px;
+  background: rgba(245,158,11,0.06);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 14px;
+  gap: 8px;
+  box-shadow: 0 0 40px rgba(245,158,11,0.1), 0 24px 40px rgba(0,0,0,0.4);
+  animation: paperFloat 4s ease-in-out infinite;
+}
+.brief-line {
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(245,158,11,0.25);
+}
+.brief-line:nth-child(1) { width: 70%; }
+.brief-line:nth-child(2) { width: 90%; }
+.brief-line:nth-child(3) { width: 60%; }
+.brief-line:nth-child(4) { width: 80%; }
+.brief-line:nth-child(5) { width: 45%; }
+
+.brief-stamp {
+  position: absolute;
+  bottom: 14px;
+  right: 10px;
+  width: 22px; height: 22px;
+  border: 1.5px solid rgba(245,158,11,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brief-stamp::after {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(245,158,11,0.3);
+  box-shadow: 0 0 6px rgba(245,158,11,0.4);
+}
+
+.brief-paper-back {
+  position: absolute;
+  z-index: 1;
+  width: 100px;
+  height: 130px;
+  background: rgba(245,158,11,0.03);
+  border: 1px solid rgba(245,158,11,0.1);
+  border-radius: 8px;
+  transform: rotate(-6deg) translate(-8px, 4px);
+}
+.brief-paper-back2 {
+  position: absolute;
+  z-index: 0;
+  width: 100px;
+  height: 130px;
+  background: rgba(245,158,11,0.02);
+  border: 1px solid rgba(245,158,11,0.07);
+  border-radius: 8px;
+  transform: rotate(5deg) translate(10px, 6px);
+}
+
+.brief-glow {
+  position: absolute;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(245,158,11,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+@keyframes paperFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 .hl-ring {
@@ -417,6 +539,15 @@ nav {
 
 @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
+/* Brief highlight wrap */
+.highlight-wrap.brief-wrap {
+  background: linear-gradient(135deg, rgba(245,158,11,0.08) 0%, transparent 60%);
+  margin-top: 24px;
+}
+.highlight-wrap.brief-wrap .highlight-card::before {
+  mask-image: radial-gradient(ellipse 70% 80% at 80% 50%, black 0%, transparent 100%);
+}
+
 /* PROJECTS */
 .projects-section {
   max-width: 1080px;
@@ -456,6 +587,7 @@ nav {
 .pc-1::before { background: radial-gradient(circle at 50% 0%, rgba(123,110,246,0.07) 0%, transparent 65%); }
 .pc-2::before { background: radial-gradient(circle at 50% 0%, rgba(167,139,250,0.07) 0%, transparent 65%); }
 .pc-3::before { background: radial-gradient(circle at 50% 0%, rgba(34,197,94,0.05) 0%, transparent 65%); }
+.pc-4::before { background: radial-gradient(circle at 50% 0%, rgba(245,158,11,0.07) 0%, transparent 65%); }
 
 .card-top {
   display: flex;
@@ -481,6 +613,8 @@ nav {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.pc-4 .card-icon { border-color: rgba(245,158,11,0.2); background: rgba(245,158,11,0.05); }
+.pc-4 .card-icon svg { stroke: rgba(245,158,11,0.7); }
 
 .card-num {
   font-family: 'DM Mono', monospace;
@@ -519,6 +653,30 @@ nav {
   text-transform: uppercase;
 }
 
+/* New badge for recently launched */
+.card-badge-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--amber);
+  border: 1px solid rgba(245,158,11,0.25);
+  background: rgba(245,158,11,0.08);
+  padding: 3px 8px;
+  border-radius: 100px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+.card-badge-new-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 5px var(--amber);
+  animation: blink 2s ease-in-out infinite;
+}
+
 .card-arrow {
   width: 28px; height: 28px;
   border: 1px solid var(--border);
@@ -531,6 +689,7 @@ nav {
   transition: border-color 0.2s, color 0.2s;
 }
 .project-card:hover .card-arrow { border-color: var(--border-hover); color: var(--text); }
+.pc-4:hover .card-arrow { border-color: rgba(245,158,11,0.4); color: var(--amber); }
 
 /* FOOTER */
 footer {
@@ -576,6 +735,7 @@ footer {
 .reveal.in { opacity: 1; transform: none; }
 .d1 { transition-delay: 0.08s; }
 .d2 { transition-delay: 0.16s; }
+.d3 { transition-delay: 0.24s; }
 
 @media (max-width: 768px) {
   nav { padding: 0 20px; }
@@ -585,7 +745,7 @@ footer {
   .hero-stats { gap: 24px; }
   .section { padding: 80px 20px; }
   .highlight-card { grid-template-columns: 1fr; gap: 40px; padding: 32px; }
-  .hl-visual { height: 160px; }
+  .hl-visual, .brief-visual { height: 160px; }
   .projects-section { padding: 0 20px 80px; }
   .projects-grid { grid-template-columns: 1fr; }
   .footer-inner { flex-direction: column; gap: 24px; align-items: flex-start; }
@@ -598,6 +758,7 @@ footer {
   <a href="#" class="nav-logo">C<span>/</span>N</a>
   <div class="nav-links">
     <a href="#highlight">Studio</a>
+    <a href="#brief">Brief</a>
     <a href="#projects">Projects</a>
   </div>
   <div class="nav-badge">
@@ -633,7 +794,7 @@ footer {
 
   <div class="hero-stats">
     <div class="stat-item">
-      <div class="stat-num">3</div>
+      <div class="stat-num">4</div>
       <div class="stat-label">Projects</div>
     </div>
     <div class="stat-div"></div>
@@ -653,7 +814,7 @@ footer {
 <div class="section" id="highlight">
   <div class="reveal">
     <div class="section-eyebrow">Studio</div>
-    <div class="section-title">Flagship Project</div>
+    <div class="section-title">Flagship Projects</div>
   </div>
 
   <div class="highlight-wrap reveal">
@@ -674,6 +835,38 @@ footer {
         <div class="orbit-wrap orbit-1"><span class="orbit-dot"></span></div>
         <div class="orbit-wrap orbit-2"><span class="orbit-dot"></span></div>
         <div class="hl-center">H</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BRIEF HIGHLIGHT -->
+  <div class="highlight-wrap brief-wrap reveal" id="brief" style="margin-top: 20px;">
+    <div class="highlight-card" style="cursor:pointer;" onclick="window.open('https://clarknoeding.com/brief.github.io','_blank')">
+      <div>
+        <div class="hl-tag new">
+          <span class="hl-tag-dot"></span>
+          Just Launched
+        </div>
+        <h2 class="hl-title">Brief</h2>
+        <p class="hl-desc">A powerful brief designer, creator & manager. Craft polished, structured briefs with precision — from creative concepts to client deliverables. Design, organize, and manage every brief in one place.</p>
+        <div class="hl-date">Released — <span class="amber">2026</span></div>
+        <a href="https://clarknoeding.com/brief.github.io" target="_blank" class="hl-link" onclick="event.stopPropagation()">
+          Open Brief
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+      <div class="brief-visual">
+        <div class="brief-glow"></div>
+        <div class="brief-paper-back2"></div>
+        <div class="brief-paper-back"></div>
+        <div class="brief-paper">
+          <div class="brief-line"></div>
+          <div class="brief-line"></div>
+          <div class="brief-line"></div>
+          <div class="brief-line"></div>
+          <div class="brief-line"></div>
+          <div class="brief-stamp"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -728,6 +921,23 @@ footer {
       <div class="card-desc">Strategic AI roadmaps, generated intelligently. From vision to execution — structured, clear, and future-ready.</div>
       <div class="card-footer">
         <span class="card-tag">Strategic Planning</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </div>
+
+    <!-- BRIEF PROJECT CARD -->
+    <div class="project-card pc-4 reveal d3" onclick="window.open('https://clarknoeding.com/brief.github.io','_blank')" style="cursor:pointer;">
+      <div class="card-top">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <span class="card-num">04</span>
+      </div>
+      <div class="card-title">Brief</div>
+      <div class="card-desc">A brief designer, creator & manager. Craft, structure, and deliver polished briefs — from first idea to final client document.</div>
+      <div class="card-badge-new"><span class="card-badge-new-dot"></span>New</div>
+      <div class="card-footer">
+        <span class="card-tag">Brief Management</span>
         <div class="card-arrow">→</div>
       </div>
     </div>
